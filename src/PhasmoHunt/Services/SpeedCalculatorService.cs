@@ -9,7 +9,13 @@ public sealed class SpeedCalculatorService
     public const int MinTotalSteps = SegmentCount * MinStepsPerSegment;
 
     public const double ReferenceSpeedMps = 1.7;
-    public const double ReferenceIntervalSeconds = 0.64;
+
+    /// <summary>
+    /// Offset usado pelo Zero-Network BPM finder: m/s = 1 / (intervalo + offset).
+    /// Ver metronome-v7.js → bpmToSpeed @ 100%: bpm / (60 + bpm * 0.075).
+    /// </summary>
+    public const double FootstepTimingOffsetSeconds = 0.075;
+
     public const double CvSoftCap = 0.25;
     public const double SpeedMatchToleranceMps = 0.15;
     public const double StableSpreadMps = 0.20;
@@ -64,8 +70,18 @@ public sealed class SpeedCalculatorService
         };
     }
 
-    public static double IntervalToSpeed(double averageIntervalSeconds) =>
-        ReferenceSpeedMps * (ReferenceIntervalSeconds / averageIntervalSeconds);
+    /// <summary>
+    /// Converte intervalo médio entre passos (s) em m/s, alinhado ao BPM do Zero-Network.
+    /// </summary>
+    public static double IntervalToSpeed(double averageIntervalSeconds)
+    {
+        if (averageIntervalSeconds <= 0)
+        {
+            return 0;
+        }
+
+        return 1.0 / (averageIntervalSeconds + FootstepTimingOffsetSeconds);
+    }
 
     private static bool TryPrepare(
         IReadOnlyList<TimeSpan> stepTimestamps,
