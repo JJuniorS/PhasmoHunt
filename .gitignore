@@ -6,4 +6,7 @@ obj/
 *.cache
 AppData/
 dist/
-docs/
+docs/*
+!docs/superpowers/
+!docs/superpowers/**
+.superpowers/
