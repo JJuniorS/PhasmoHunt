@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:converters="clr-namespace:PhasmoHunt.Converters"
         Title="Phasmo Hunt"
+        Icon="pack://application:,,,/Assets/app-icon.png"
         Width="520"
         Height="820"
         MinWidth="400"
