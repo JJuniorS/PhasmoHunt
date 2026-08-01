@@ -1,18 +1,68 @@
 # Phasmo Hunt
 
-Assistente manual externo para Phasmophobia (Windows, .NET 8 + WPF).
+Assistente manual externo para **Phasmophobia** — overlay Always-On-Top no Windows (.NET 8 + WPF).
 
-## O que é
+Ajuda a identificar o fantasma medindo a velocidade dos passos, cruzando com evidências e acompanhando peculiaridades de caçada. **Toda informação é inserida por você** (atalhos / interface). Nada é lido do processo do jogo.
 
-Overlay Always-On-Top com cronômetro e medidor de velocidade do fantasma. **Toda informação é inserida manualmente** (botão lateral do mouse ou UI).
+---
+
+## Funcionalidades
+
+### Medição de velocidade
+
+- Cada toque no atalho de passo registra um timestamp (o primeiro toque também inicia a sessão).
+- Após **3 segundos** sem novos passos, a leitura finaliza sozinha.
+- Os cliques são divididos em **3 médias** (`P1` / `P2` / `P3`): `floor(n/3)` passos por parte; o resto é descartado.
+- Mínimo útil: **6 cliques** (2 por parte). Ex.: 6 → 2/2/2 · 24 → 8/8/8 · 7 → 2/2/2 (descarta 1).
+- Velocidade em m/s alinhada ao BPM finder da comunidade Zero-Network.
+- Tolerância de correspondência: **±0,10 m/s**.
+- Mostra padrão da leitura (estável, acelerando, desacelerando, irregular) e confiança.
+
+### Catálogo e filtros
+
+- Catálogo offline com **30 fantasmas** (velocidades + evidências), baseado em dados públicos da [wiki](https://phasmophobia.fandom.com/wiki/Ghost).
+- Filtra por velocidade medida **e** evidências selecionadas.
+- **The Mimic** inclui Orb falsa no filtro (como no jogo).
+- Lista visual: verde = apto · vermelho = fora · neutro = pendente.
+- Histórico de leituras com consenso entre medições da sessão.
+
+### Peculiaridades
+
+Timers e marcadores úteis durante a investigação:
+
+| Peculiaridade | Atalho | Comportamento |
+|---------------|--------|----------------|
+| **Demon** | `Shift + 1` | Cronômetro de cooldown. Se parar abaixo de 25 s, filtra o catálogo para Demon. |
+| **Incenso** | `Shift + 2` | Contagem regressiva de 3 minutos (reinicia a cada toque). |
+| **Obambo** | `Shift + 3` | Ciclo paz / agressivo a cada 2 minutos. |
+
+### Interface
+
+- Janela Always-On-Top, compactável para ocupar menos espaço na tela.
+- Painel de **evidências** para filtrar junto com a velocidade.
+- **Configurações:** transparência (0,3–1,0) e escala da interface (0,8–1,5), salvas em `%AppData%\PhasmoHunt\settings.json`.
+- Botão **Limpar** zera medição, evidências, histórico e peculiaridades.
+
+### Atalhos
+
+| Ação | Atalho |
+|------|--------|
+| Registrar passo | Tecla `1` ou **botão lateral** do mouse (atrás) |
+| Demon | `Shift + 1` |
+| Incenso | `Shift + 2` |
+| Obambo | `Shift + 3` |
+
+---
 
 ## Uso rápido
 
-1. Ao ouvir passos, pressione o **botão lateral** (cada toque = 1 passo).
+1. Ao ouvir passos, pressione `1` ou o **botão lateral** (cada toque = 1 passo).
 2. Pare de clicar por **3 segundos** — a leitura finaliza sozinha.
-3. Os cliques são divididos em **3 médias** (`floor(n/3)` passos por parte; resto descartado).
-4. Mínimo útil: **6 cliques** (2 por parte). Ex.: 6→2/2/2, 24→8/8/8, 7→2/2/2 (descarta 1).
-5. Marque **Evidências** para filtrar fantasmas junto com a velocidade.
+3. Confira a média geral, as 3 partes e os fantasmas compatíveis.
+4. Marque **Evidências** para refinar o filtro.
+5. Use as peculiaridades (`Shift + 1/2/3`) conforme a investigação.
+
+---
 
 ## O que esta aplicação NÃO faz
 
@@ -22,13 +72,33 @@ Overlay Always-On-Top com cronômetro e medidor de velocidade do fantasma. **Tod
 - Não captura áudio ou tela do jogo
 - Não automatiza ações no jogo
 
+É um overlay de apoio manual — não é cheat client.
+
+---
+
 ## Catálogo de fantasmas
 
-Velocidades de caçada ficam embutidas offline (`GhostCatalogService`), com base em dados públicos da comunidade/wiki ([Ghost](https://phasmophobia.fandom.com/wiki/Ghost)). Nada é lido do cliente do jogo.
+Velocidades de caçada ficam embutidas em `GhostCatalogService`. Nada é lido do cliente do jogo. Referência pública: [Ghost — Phasmophobia Wiki](https://phasmophobia.fandom.com/wiki/Ghost).
+
+---
 
 ## Desenvolvimento
+
+Requisitos: .NET 8 SDK (Windows).
 
 ```bash
 dotnet build src/PhasmoHunt/PhasmoHunt.csproj
 dotnet run --project src/PhasmoHunt/PhasmoHunt.csproj
+```
+
+### Estrutura
+
+```
+src/PhasmoHunt/
+  Models/       # Fantasmas, evidências, medições, settings
+  Services/     # Catálogo, cálculo de velocidade, hotkeys, persistência
+  ViewModels/   # Lógica da UI
+  Views/        # MainWindow (WPF)
+  Themes/       # Tema escuro
+  Assets/       # Ícones de evidências e peculiaridades
 ```
