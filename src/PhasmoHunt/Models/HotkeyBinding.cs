@@ -14,4 +14,9 @@ public sealed class HotkeyBinding
         VirtualKey = virtualKey;
         Modifiers = modifiers;
     }
+
+    public HotkeyBinding Clone() => new(VirtualKey, Modifiers);
+
+    public bool SameAs(HotkeyBinding? other) =>
+        other is not null && VirtualKey == other.VirtualKey && Modifiers == other.Modifiers;
 }

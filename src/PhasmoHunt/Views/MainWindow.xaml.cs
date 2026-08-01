@@ -103,6 +103,22 @@ public partial class MainWindow : Window
         }
     }
 
+    private void SettingsButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        var settingsWindow = new SettingsWindow
+        {
+            Owner = this,
+            DataContext = _viewModel.CreateSettingsViewModel()
+        };
+
+        var result = settingsWindow.ShowDialog();
+        if (result == true)
+        {
+            _viewModel.ApplySettingsFromDisk();
+            Opacity = _viewModel.Opacity;
+        }
+    }
+
     private void CloseButton_OnClick(object sender, RoutedEventArgs e) => Close();
 
     private void OnClosed(object? sender, EventArgs e)

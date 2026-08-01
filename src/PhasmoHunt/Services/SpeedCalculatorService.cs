@@ -35,7 +35,8 @@ public sealed class SpeedCalculatorService
     public SpeedMeasurement Calculate(
         IReadOnlyList<TimeSpan> stepTimestamps,
         IReadOnlyList<GhostInfo> ghostCatalog,
-        DateTimeOffset? recordedAt = null)
+        DateTimeOffset? recordedAt = null,
+        double speedFactor = 1.0)
     {
         if (!TryPrepare(stepTimestamps, out var ordered, out var stepsPerSegment))
         {
@@ -52,7 +53,7 @@ public sealed class SpeedCalculatorService
         var confidence = ComputeConfidence(intervals, averageInterval);
         var segments = BuildSegments(ordered, stepsPerSegment);
         var pattern = DetectPattern(segments);
-        var compatible = MatchGhosts(estimatedSpeed, segments, ghostCatalog);
+        var compatible = MatchGhosts(estimatedSpeed, segments, ghostCatalog, speedFactor);
 
         return new SpeedMeasurement
         {
@@ -66,6 +67,33 @@ public sealed class SpeedCalculatorService
             Segments = segments,
             Pattern = pattern,
             PatternText = PatternToText(pattern, segments),
+            CompatibleGhosts = compatible
+        };
+    }
+
+    /// <summary>
+    /// Recomputa a lista de fantasmas compatíveis para uma medição já existente,
+    /// usando um novo catálogo/fator de velocidade (ex.: após alterar configurações).
+    /// </summary>
+    public SpeedMeasurement RematchCompatibleGhosts(
+        SpeedMeasurement measurement,
+        IReadOnlyList<GhostInfo> ghostCatalog,
+        double speedFactor)
+    {
+        var compatible = MatchGhosts(measurement.EstimatedSpeedMps, measurement.Segments, ghostCatalog, speedFactor);
+
+        return new SpeedMeasurement
+        {
+            RecordedAt = measurement.RecordedAt,
+            StepTimestamps = measurement.StepTimestamps,
+            TotalTime = measurement.TotalTime,
+            AverageIntervalSeconds = measurement.AverageIntervalSeconds,
+            StepsPerSecond = measurement.StepsPerSecond,
+            EstimatedSpeedMps = measurement.EstimatedSpeedMps,
+            ConfidencePercent = measurement.ConfidencePercent,
+            Segments = measurement.Segments,
+            Pattern = measurement.Pattern,
+            PatternText = measurement.PatternText,
             CompatibleGhosts = compatible
         };
     }
@@ -185,36 +213,39 @@ public sealed class SpeedCalculatorService
     private static IReadOnlyList<GhostInfo> MatchGhosts(
         double overallSpeed,
         IReadOnlyList<SpeedSegment> segments,
-        IReadOnlyList<GhostInfo> catalog)
+        IReadOnlyList<GhostInfo> catalog,
+        double speedFactor = 1.0)
     {
         var segmentSpeeds = segments.Select(s => s.EstimatedSpeedMps).ToArray();
 
         return catalog
             .Where(g =>
             {
-                if (g.MatchesSpeed(overallSpeed, SpeedMatchToleranceMps))
+                if (g.MatchesSpeed(overallSpeed, SpeedMatchToleranceMps, speedFactor))
                 {
                     return true;
                 }
 
-                var hits = segmentSpeeds.Count(speed => g.MatchesSpeed(speed, SpeedMatchToleranceMps));
+                var hits = segmentSpeeds.Count(speed => g.MatchesSpeed(speed, SpeedMatchToleranceMps, speedFactor));
                 return hits >= 2;
             })
-            .OrderBy(g => segmentSpeeds.Min(speed => DistanceToRange(speed, g)))
+            .OrderBy(g => segmentSpeeds.Min(speed => DistanceToRange(speed, g, speedFactor)))
             .ThenBy(g => g.Name, StringComparer.OrdinalIgnoreCase)
             .ToArray();
     }
 
-    private static double DistanceToRange(double speed, GhostInfo ghost)
+    private static double DistanceToRange(double speed, GhostInfo ghost, double speedFactor = 1.0)
     {
-        if (speed < ghost.MinSpeedMps)
+        var min = ghost.MinSpeedMps * speedFactor;
+        var max = ghost.MaxSpeedMps * speedFactor;
+        if (speed < min)
         {
-            return ghost.MinSpeedMps - speed;
+            return min - speed;
         }
 
-        if (speed > ghost.MaxSpeedMps)
+        if (speed > max)
         {
-            return speed - ghost.MaxSpeedMps;
+            return speed - max;
         }
 
         return 0;

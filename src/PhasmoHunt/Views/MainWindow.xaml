@@ -34,7 +34,6 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition x:Name="GhostsRow" Height="*" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <!-- Title -->
@@ -52,7 +51,7 @@
                         Style="{StaticResource SecondaryButton}"
                         Margin="0,0,8,0"
                         Padding="10,6"
-                        Command="{Binding ToggleSettingsCommand}" />
+                        Click="SettingsButton_OnClick" />
                 <Button Grid.Column="2"
                         Content="{Binding CompactToggleGlyph}"
                         ToolTip="Minimizar / Expandir"
@@ -386,23 +385,6 @@
                     </DockPanel>
                 </Border>
             </Grid>
-
-            <Border Grid.Row="6"
-                    Margin="0,8,0,0"
-                    Background="{StaticResource PanelBrush}"
-                    CornerRadius="8"
-                    Padding="12"
-                    Visibility="{Binding ShowSettingsPanel, Converter={StaticResource BoolToVis}}">
-                <StackPanel>
-                    <TextBlock Text="Configurações" FontWeight="SemiBold" Margin="0,0,0,8" />
-                    <TextBlock Text="Transparência" Style="{StaticResource MutedText}" />
-                    <Slider Minimum="0.3" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="True"
-                            Value="{Binding Opacity, Mode=TwoWay}" Margin="0,4,0,10" />
-                    <TextBlock Text="Escala da interface" Style="{StaticResource MutedText}" />
-                    <Slider Minimum="0.8" Maximum="1.5" TickFrequency="0.05" IsSnapToTickEnabled="True"
-                            Value="{Binding UiScale, Mode=TwoWay}" Margin="0,4,0,4" />
-                </StackPanel>
-            </Border>
         </Grid>
     </Border>
 </Window>

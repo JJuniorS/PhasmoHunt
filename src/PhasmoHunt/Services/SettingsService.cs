@@ -37,20 +37,22 @@ public sealed class SettingsService
             {
                 Current = new AppSettings();
                 SaveImmediate(Current);
-                return Current;
             }
-
-            try
+            else
             {
-                var json = File.ReadAllText(_settingsPath);
-                Current = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? new AppSettings();
-            }
-            catch
-            {
-                Current = new AppSettings();
+                try
+                {
+                    var json = File.ReadAllText(_settingsPath);
+                    Current = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? new AppSettings();
+                }
+                catch
+                {
+                    Current = new AppSettings();
+                }
             }
 
             Normalize(Current);
+            Current.EnsureHotkeyDefaults();
             return Current;
         }
     }
@@ -60,6 +62,7 @@ public sealed class SettingsService
         lock (_sync)
         {
             Normalize(settings);
+            settings.EnsureHotkeyDefaults();
             Current = settings;
             var json = JsonSerializer.Serialize(settings, JsonOptions);
             File.WriteAllText(_settingsPath, json);
@@ -96,5 +99,11 @@ public sealed class SettingsService
         settings.UiScale = Math.Clamp(settings.UiScale, 0.8, 1.5);
         settings.Width = Math.Max(settings.Width, 320);
         settings.Height = Math.Max(settings.Height, 420);
+
+        // Corrupt/missing disk values only — UI Salvar rejects <= 0 before calling save
+        if (settings.GhostSpeedPercent <= 0 || double.IsNaN(settings.GhostSpeedPercent) || double.IsInfinity(settings.GhostSpeedPercent))
+        {
+            settings.GhostSpeedPercent = 100;
+        }
     }
 }

@@ -23,9 +23,11 @@ public partial class GhostListItemViewModel : ObservableObject
 
     public GhostInfo Ghost { get; }
     public string Name { get; }
-    public string SpeedRangeText { get; }
     public string Notes { get; }
     public IReadOnlyList<ImageSource> EvidenceIcons { get; }
+
+    [ObservableProperty]
+    private string _speedRangeText = "";
 
     [ObservableProperty]
     private bool? _isEligible;
@@ -35,6 +37,11 @@ public partial class GhostListItemViewModel : ObservableObject
 
     [ObservableProperty]
     private Brush _statusBrush = PendingBrush;
+
+    public void ApplySpeedFactor(double speedFactor)
+    {
+        SpeedRangeText = Ghost.FormatSpeedRange(speedFactor);
+    }
 
     public void SetEligibility(bool? eligible)
     {

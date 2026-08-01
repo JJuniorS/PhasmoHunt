@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using PhasmoHunt.Models;
 
 namespace PhasmoHunt.Services;
 
@@ -13,7 +14,7 @@ public enum HotkeyAction
 }
 
 /// <summary>
-/// Global step hotkeys: tecla 1 + botão lateral do mouse (XBUTTON1).
+/// Global hotkeys registered from user settings.
 /// Does not interact with any game process.
 /// </summary>
 public sealed class HotkeyService : IDisposable
@@ -54,15 +55,21 @@ public sealed class HotkeyService : IDisposable
         _source?.AddHook(WndProc);
     }
 
-    public void RegisterStepHotkeys()
+    public IReadOnlyList<string> RegisterFromSettings(AppSettings settings)
     {
         UnregisterAll();
-        RegisterBinding(HotkeyAction.Step, VkDigit1, 0);
-        RegisterBinding(HotkeyAction.Step, VkXButton1, 0);
-        RegisterBinding(HotkeyAction.DemonCooldown, VkDigit1, ModShift);
-        RegisterBinding(HotkeyAction.IncenseTimer, VkDigit2, ModShift);
-        RegisterBinding(HotkeyAction.ObamboCycle, VkDigit3, ModShift);
+        settings.EnsureHotkeyDefaults();
+        var failed = new List<string>();
+        if (!RegisterBinding(HotkeyAction.Step, settings.StepHotkey.VirtualKey, settings.StepHotkey.Modifiers))
+            failed.Add("Passo");
+        if (!RegisterBinding(HotkeyAction.DemonCooldown, settings.DemonCooldownHotkey.VirtualKey, settings.DemonCooldownHotkey.Modifiers))
+            failed.Add("Demônio");
+        if (!RegisterBinding(HotkeyAction.IncenseTimer, settings.IncenseTimerHotkey.VirtualKey, settings.IncenseTimerHotkey.Modifiers))
+            failed.Add("Incenso");
+        if (!RegisterBinding(HotkeyAction.ObamboCycle, settings.ObamboCycleHotkey.VirtualKey, settings.ObamboCycleHotkey.Modifiers))
+            failed.Add("Obambo");
         EnsureMouseHook();
+        return failed;
     }
 
     public void UnregisterAll()
@@ -94,27 +101,24 @@ public sealed class HotkeyService : IDisposable
         _source = null;
     }
 
-    private void RegisterBinding(HotkeyAction action, int virtualKey, int modifiers)
+    private bool RegisterBinding(HotkeyAction action, int virtualKey, int modifiers)
     {
         if (IsMouseSideButton(virtualKey))
         {
             _mouseVkToAction[virtualKey] = action;
-            return;
+            return true;
         }
 
         if (_hwnd == IntPtr.Zero)
-        {
-            return;
-        }
+            return false;
 
         var id = _nextHotkeyId++;
         var mods = (uint)modifiers | ModNoRepeat;
         if (!RegisterHotKey(_hwnd, id, mods, (uint)virtualKey))
-        {
-            return;
-        }
+            return false;
 
         _idToAction[id] = action;
+        return true;
     }
 
     private void EnsureMouseHook()

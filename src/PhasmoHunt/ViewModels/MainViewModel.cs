@@ -75,6 +75,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             Ghosts.Add(new GhostListItemViewModel(ghost));
         }
 
+        ApplySpeedFactorToGhostList();
+
         CatalogCountText = $"{Ghosts.Count} fantasmas no catálogo";
         foreach (var evidence in EvidenceTypeExtensions.All)
         {
@@ -110,8 +112,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty] private string _catalogCountText = "";
     [ObservableProperty] private double _opacity = 0.92;
     [ObservableProperty] private double _uiScale = 1.0;
-    [ObservableProperty] private string _stepHotkeyLabel = "Botão lateral / 1";
-    [ObservableProperty] private bool _isSettingsExpanded;
+    [ObservableProperty] private string _stepHotkeyLabel = "1";
     [ObservableProperty] private bool _isEvidencePanelOpen;
     [ObservableProperty] private bool _isUiCompact;
     [ObservableProperty] private bool _hasSelectedEvidence;
@@ -130,8 +131,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public bool ShowEvidencePanel => IsEvidencePanelOpen && !IsUiCompact;
 
-    public bool ShowSettingsPanel => IsSettingsExpanded && !IsUiCompact;
-
     public bool CanFinish =>
         SessionState == MeasurementSessionState.Running
         && SpeedCalculatorService.CanCalculate(StepCount);
@@ -140,12 +139,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         OnPropertyChanged(nameof(CompactToggleGlyph));
         OnPropertyChanged(nameof(ShowEvidencePanel));
-        OnPropertyChanged(nameof(ShowSettingsPanel));
     }
 
     partial void OnIsEvidencePanelOpenChanged(bool value) => OnPropertyChanged(nameof(ShowEvidencePanel));
-
-    partial void OnIsSettingsExpandedChanged(bool value) => OnPropertyChanged(nameof(ShowSettingsPanel));
 
     partial void OnOpacityChanged(double value)
     {
@@ -198,8 +194,49 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public AppSettings GetSettingsSnapshot() => _settingsService.Current;
 
-    [RelayCommand]
-    private void ToggleSettings() => IsSettingsExpanded = !IsSettingsExpanded;
+    public double GhostSpeedFactor =>
+        _settingsService.Current.GhostSpeedPercent > 0
+            ? _settingsService.Current.GhostSpeedPercent / 100.0
+            : 1.0;
+
+    public SettingsViewModel CreateSettingsViewModel() => new(_settingsService);
+
+    public void ApplySettingsFromDisk()
+    {
+        var settings = _settingsService.Current;
+        Opacity = settings.Opacity;
+        UiScale = settings.UiScale;
+        ApplySpeedFactorToGhostList();
+        RematchSessionReadings();
+        ApplyHotkeysFromSettings();
+        if (_sessionReadings.Count > 0)
+        {
+            ApplyMeasurement(_sessionReadings[0]);
+            RebuildHistory();
+            RefreshSessionComparison();
+        }
+
+        RefreshGhostEligibility();
+    }
+
+    private void ApplySpeedFactorToGhostList()
+    {
+        var factor = GhostSpeedFactor;
+        foreach (var item in Ghosts)
+        {
+            item.ApplySpeedFactor(factor);
+        }
+    }
+
+    private void RematchSessionReadings()
+    {
+        var catalog = _ghostCatalog.GetAll();
+        var factor = GhostSpeedFactor;
+        for (var i = 0; i < _sessionReadings.Count; i++)
+        {
+            _sessionReadings[i] = _calculator.RematchCompatibleGhosts(_sessionReadings[i], catalog, factor);
+        }
+    }
 
     [RelayCommand]
     private void ToggleEvidencePanel() => IsEvidencePanelOpen = !IsEvidencePanelOpen;
@@ -210,7 +247,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
         IsUiCompact = !IsUiCompact;
         if (IsUiCompact)
         {
-            IsSettingsExpanded = false;
             IsEvidencePanelOpen = false;
         }
     }
@@ -343,7 +379,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             ElapsedText = "0.00 s";
             return;
         }
-        var measurement = _calculator.Calculate(_stepTimestamps, _ghostCatalog.GetAll());
+        var measurement = _calculator.Calculate(_stepTimestamps, _ghostCatalog.GetAll(), speedFactor: GhostSpeedFactor);
         ApplyMeasurement(measurement);
 
         _sessionReadings.Insert(0, measurement);
@@ -579,7 +615,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         PatternText = measurement.PatternText;
         CompatibleGhostsText = measurement.CompatibleGhosts.Count == 0
             ? "Nenhum no catálogo atual"
-            : string.Join(", ", measurement.CompatibleGhosts.Select(g => $"{g.Name} ({g.SpeedRangeText})"));
+            : string.Join(", ", measurement.CompatibleGhosts.Select(g => $"{g.Name} ({g.FormatSpeedRange(GhostSpeedFactor)})"));
         ElapsedText = TotalTimeText;
         StepCount = measurement.StepTimestamps.Count;
     }
@@ -699,12 +735,22 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private void ApplyHotkeysFromSettings()
     {
-        _hotkeyService.RegisterStepHotkeys();
+        var failed = _hotkeyService.RegisterFromSettings(_settingsService.Current);
         RefreshHotkeyLabels();
+        if (failed.Count > 0)
+        {
+            MessageBox.Show(
+                "Não foi possível registrar a(s) hotkey(s): " + string.Join(", ", failed) +
+                ".\nOutro aplicativo pode estar usando a mesma combinação. A preferência foi salva mesmo assim.",
+                "Phasmo Hunt",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
     }
 
     private void RefreshHotkeyLabels()
     {
-        StepHotkeyLabel = "Botão lateral / 1";
+        var step = _settingsService.Current.StepHotkey;
+        StepHotkeyLabel = HotkeyDisplayHelper.Format(step.VirtualKey, step.Modifiers);
     }
 }
