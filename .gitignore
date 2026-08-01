@@ -7,6 +7,4 @@ obj/
 AppData/
 dist/
 docs/*
-!docs/superpowers/
-!docs/superpowers/**
 .superpowers/
