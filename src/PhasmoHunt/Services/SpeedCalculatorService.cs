@@ -17,7 +17,7 @@ public sealed class SpeedCalculatorService
     public const double FootstepTimingOffsetSeconds = 0.075;
 
     public const double CvSoftCap = 0.25;
-    public const double SpeedMatchToleranceMps = 0.15;
+    public const double SpeedMatchToleranceMps = 0.10;
     public const double StableSpreadMps = 0.20;
     public const double TrendDeltaMps = 0.12;
 

@@ -50,13 +50,7 @@ public sealed class SettingsService
                 Current = new AppSettings();
             }
 
-            var previousStepVk = Current.StepHotkey?.VirtualKey;
             Normalize(Current);
-            if (previousStepVk == 0x20 && Current.StepHotkey is { VirtualKey: HotkeyService.VkXButton1 })
-            {
-                SaveImmediate(Current);
-            }
-
             return Current;
         }
     }
@@ -102,14 +96,5 @@ public sealed class SettingsService
         settings.UiScale = Math.Clamp(settings.UiScale, 0.8, 1.5);
         settings.Width = Math.Max(settings.Width, 320);
         settings.Height = Math.Max(settings.Height, 420);
-        settings.StartHotkey ??= new HotkeyBinding(0x77);
-        settings.StepHotkey ??= new HotkeyBinding(HotkeyService.VkXButton1);
-        settings.FinishHotkey ??= new HotkeyBinding(0x0D);
-
-        // Migra default antigo (Espaço) para o botão lateral do mouse.
-        if (settings.StepHotkey.VirtualKey == 0x20 && settings.StepHotkey.Modifiers == 0)
-        {
-            settings.StepHotkey = new HotkeyBinding(HotkeyService.VkXButton1);
-        }
     }
 }

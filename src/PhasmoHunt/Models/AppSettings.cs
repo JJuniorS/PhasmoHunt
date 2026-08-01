@@ -10,9 +10,9 @@ public sealed class AppSettings
     public double UiScale { get; set; } = 1.0;
     public AppTheme Theme { get; set; } = AppTheme.Dark;
 
-    // VK_F8 = 0x77, VK_XBUTTON1 = 0x05 (botão lateral atrás), VK_RETURN = 0x0D
-    // Passo: botão lateral + tecla 1 (registrada sempre em HotkeyService).
-    public HotkeyBinding StartHotkey { get; set; } = new(0x77);
-    public HotkeyBinding StepHotkey { get; set; } = new(0x05);
-    public HotkeyBinding FinishHotkey { get; set; } = new(0x0D);
+    // Hotkeys de passo são fixas: tecla 1 + botão lateral (XBUTTON1).
+    // Campos abaixo mantidos só para compatibilidade com settings.json antigo.
+    public HotkeyBinding? StartHotkey { get; set; }
+    public HotkeyBinding? StepHotkey { get; set; }
+    public HotkeyBinding? FinishHotkey { get; set; }
 }

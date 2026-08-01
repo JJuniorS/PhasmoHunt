@@ -1,5 +1,7 @@
+using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PhasmoHunt.Models;
+using PhasmoHunt.Services;
 
 namespace PhasmoHunt.ViewModels;
 
@@ -9,6 +11,7 @@ public partial class EvidenceOptionViewModel : ObservableObject
     {
         Type = type;
         DisplayName = type.ToDisplayName();
+        Icon = EvidenceIconService.GetIcon(type);
         _onChanged = onChanged;
     }
 
@@ -16,6 +19,7 @@ public partial class EvidenceOptionViewModel : ObservableObject
 
     public EvidenceType Type { get; }
     public string DisplayName { get; }
+    public ImageSource? Icon { get; }
 
     [ObservableProperty]
     private bool _isSelected;

@@ -6,13 +6,14 @@ namespace PhasmoHunt.Services;
 
 public enum HotkeyAction
 {
-    Start = 1,
-    Step = 2,
-    Finish = 3
+    Step = 1,
+    DemonCooldown = 2,
+    ObamboCycle = 3,
+    IncenseTimer = 4
 }
 
 /// <summary>
-/// Global keyboard hotkeys via RegisterHotKey, and mouse side-buttons via WH_MOUSE_LL.
+/// Global step hotkeys: tecla 1 + botão lateral do mouse (XBUTTON1).
 /// Does not interact with any game process.
 /// </summary>
 public sealed class HotkeyService : IDisposable
@@ -21,6 +22,10 @@ public sealed class HotkeyService : IDisposable
     public const int VkXButton2 = 0x06;
     /// <summary>VK_1 — teclado principal (não numpad).</summary>
     public const int VkDigit1 = 0x31;
+    public const int VkD = 0x44;
+    public const int VkO = 0x4F;
+    public const int VkS = 0x53;
+    public const int ModShift = 0x0004;
 
     private const int WmHotkey = 0x0312;
     private const int WhMouseLl = 14;
@@ -50,18 +55,14 @@ public sealed class HotkeyService : IDisposable
         _source?.AddHook(WndProc);
     }
 
-    public void RegisterAll(int startVk, int startMods, int stepVk, int stepMods, int finishVk, int finishMods)
+    public void RegisterStepHotkeys()
     {
         UnregisterAll();
-        RegisterBinding(HotkeyAction.Start, startVk, startMods);
-        RegisterBinding(HotkeyAction.Step, stepVk, stepMods);
-        // Sempre também "1" para marcar passo (além do botão lateral / hotkey configurada).
-        if (stepVk != VkDigit1 || stepMods != 0)
-        {
-            RegisterBinding(HotkeyAction.Step, VkDigit1, 0);
-        }
-
-        RegisterBinding(HotkeyAction.Finish, finishVk, finishMods);
+        RegisterBinding(HotkeyAction.Step, VkDigit1, 0);
+        RegisterBinding(HotkeyAction.Step, VkXButton1, 0);
+        RegisterBinding(HotkeyAction.DemonCooldown, VkD, ModShift);
+        RegisterBinding(HotkeyAction.ObamboCycle, VkO, ModShift);
+        RegisterBinding(HotkeyAction.IncenseTimer, VkS, ModShift);
         EnsureMouseHook();
     }
 

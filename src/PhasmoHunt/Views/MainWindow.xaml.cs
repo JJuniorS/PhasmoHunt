@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using PhasmoHunt.Services;
 using PhasmoHunt.ViewModels;
 
@@ -9,6 +10,8 @@ public partial class MainWindow : Window
 {
     private readonly MainViewModel _viewModel;
     private bool _settingsApplied;
+    private double _expandedHeight = 820;
+    private double _expandedMinHeight = 640;
 
     public MainWindow()
     {
@@ -35,6 +38,7 @@ public partial class MainWindow : Window
             Width = settings.Width;
             Height = settings.Height;
             Opacity = settings.Opacity;
+            _expandedHeight = settings.Height;
             _settingsApplied = true;
         }
 
@@ -45,12 +49,45 @@ public partial class MainWindow : Window
             {
                 Opacity = _viewModel.Opacity;
             }
+            else if (args.PropertyName == nameof(MainViewModel.IsUiCompact))
+            {
+                ApplyCompactMode(_viewModel.IsUiCompact);
+            }
         };
+    }
+
+    private void ApplyCompactMode(bool compact)
+    {
+        if (compact)
+        {
+            if (WindowState == WindowState.Normal)
+            {
+                _expandedHeight = Height;
+            }
+
+            _expandedMinHeight = MinHeight;
+            GhostsRow.Height = new GridLength(0);
+            MinHeight = 0;
+            SizeToContent = SizeToContent.Height;
+            Dispatcher.BeginInvoke(() =>
+            {
+                var target = ActualHeight;
+                SizeToContent = SizeToContent.Manual;
+                Height = target;
+                MinHeight = Math.Max(80, target * 0.9);
+            }, DispatcherPriority.Loaded);
+            return;
+        }
+
+        SizeToContent = SizeToContent.Manual;
+        GhostsRow.Height = new GridLength(1, GridUnitType.Star);
+        MinHeight = _expandedMinHeight > 0 ? _expandedMinHeight : 640;
+        Height = Math.Max(_expandedHeight, MinHeight);
     }
 
     private void OnBoundsChanged(object? sender, EventArgs e)
     {
-        if (!_settingsApplied || WindowState != WindowState.Normal)
+        if (!_settingsApplied || WindowState != WindowState.Normal || _viewModel.IsUiCompact)
         {
             return;
         }
@@ -70,7 +107,7 @@ public partial class MainWindow : Window
 
     private void OnClosed(object? sender, EventArgs e)
     {
-        if (WindowState == WindowState.Normal)
+        if (WindowState == WindowState.Normal && !_viewModel.IsUiCompact)
         {
             _viewModel.PersistWindowBounds(Left, Top, Width, Height);
         }

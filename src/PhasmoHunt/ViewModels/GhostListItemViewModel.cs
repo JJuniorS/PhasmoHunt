@@ -1,6 +1,7 @@
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PhasmoHunt.Models;
+using PhasmoHunt.Services;
 
 namespace PhasmoHunt.ViewModels;
 
@@ -16,6 +17,7 @@ public partial class GhostListItemViewModel : ObservableObject
         Name = ghost.Name;
         SpeedRangeText = ghost.SpeedRangeText;
         Notes = ghost.SpeedNotes ?? "";
+        EvidenceIcons = EvidenceIconService.GetIcons(ghost);
         SetEligibility(null);
     }
 
@@ -23,6 +25,7 @@ public partial class GhostListItemViewModel : ObservableObject
     public string Name { get; }
     public string SpeedRangeText { get; }
     public string Notes { get; }
+    public IReadOnlyList<ImageSource> EvidenceIcons { get; }
 
     [ObservableProperty]
     private bool? _isEligible;
