@@ -20,11 +20,10 @@ public sealed class HotkeyService : IDisposable
 {
     public const int VkXButton1 = 0x05;
     public const int VkXButton2 = 0x06;
-    /// <summary>VK_1 — teclado principal (não numpad).</summary>
+    /// <summary>VK_1–3 — teclado principal (não numpad).</summary>
     public const int VkDigit1 = 0x31;
-    public const int VkD = 0x44;
-    public const int VkO = 0x4F;
-    public const int VkS = 0x53;
+    public const int VkDigit2 = 0x32;
+    public const int VkDigit3 = 0x33;
     public const int ModShift = 0x0004;
 
     private const int WmHotkey = 0x0312;
@@ -60,9 +59,9 @@ public sealed class HotkeyService : IDisposable
         UnregisterAll();
         RegisterBinding(HotkeyAction.Step, VkDigit1, 0);
         RegisterBinding(HotkeyAction.Step, VkXButton1, 0);
-        RegisterBinding(HotkeyAction.DemonCooldown, VkD, ModShift);
-        RegisterBinding(HotkeyAction.ObamboCycle, VkO, ModShift);
-        RegisterBinding(HotkeyAction.IncenseTimer, VkS, ModShift);
+        RegisterBinding(HotkeyAction.DemonCooldown, VkDigit1, ModShift);
+        RegisterBinding(HotkeyAction.IncenseTimer, VkDigit2, ModShift);
+        RegisterBinding(HotkeyAction.ObamboCycle, VkDigit3, ModShift);
         EnsureMouseHook();
     }
 

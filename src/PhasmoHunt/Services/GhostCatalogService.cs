@@ -22,7 +22,7 @@ public sealed class GhostCatalogService
         Range("jinn", "Jinn", 1.7, 1.7, 2.5, [E.Emf5, E.Ultraviolet, E.Freezing], "2.5 com fusível + LoS + distância."),
         Range("kormos", "Kormos", 1.7, 1.7, 2.21, [E.GhostOrb, E.SpiritBox, E.Ultraviolet], "Pode acelerar se detectar passos à distância."),
         Fixed("mare", "Mare", 1.7, [E.GhostWriting, E.GhostOrb, E.SpiritBox], "Velocidade padrão com LoS."),
-        Range("moroi", "Moroi", 2.25, 1.5, 2.25, [E.GhostWriting, E.Freezing, E.SpiritBox], "Sobe com sanidade baixa (até 2.25 m/s)."),
+        Range("moroi", "Moroi", 3.71, 1.5, 3.71, [E.GhostWriting, E.Freezing, E.SpiritBox], "Sobe com sanidade baixa (até 3.71 m/s)."),
         Fixed("myling", "Myling", 1.7, [E.GhostWriting, E.Emf5, E.Ultraviolet], "Passos mais silenciosos."),
         Fixed("obake", "Obake", 1.7, [E.Emf5, E.GhostOrb, E.Ultraviolet], "Velocidade padrão com LoS."),
         Range("obambo", "Obambo", 1.7, 1.45, 1.96, [E.GhostWriting, E.Ultraviolet, E.Dots], "Calmo ~1.45 / agressivo ~1.96."),
