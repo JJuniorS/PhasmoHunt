@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Phasmo Hunt — overlay manual para Phasmophobia. Velocidade dos passos, evidências e peculiaridades. Não é cheat." />
+  <title>Phasmo Hunt</title>
+  <link rel="icon" href="assets/app-icon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="atmosphere" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a class="brand" href="#top">
+      <img src="assets/app-icon.png" alt="" width="36" height="36" />
+      <span>Phasmo Hunt</span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="#features" data-i18n="nav.features">Funcionalidades</a>
+      <a href="#how" data-i18n="nav.how">Como usar</a>
+      <a href="#download" data-i18n="nav.download">Download</a>
+    </nav>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" class="lang-btn" data-lang="pt" aria-pressed="true">PT</button>
+      <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero reveal">
+      <div class="hero-copy">
+        <p class="eyebrow" data-i18n="hero.eyebrow">CASE FILE · WINDOWS · OFFLINE</p>
+        <h1 data-i18n="hero.title">Overlay manual para identificar o fantasma</h1>
+        <p class="lede" data-i18n="hero.lede">Meça a velocidade dos passos, cruze com evidências e acompanhe peculiaridades. Tudo inserido por você — nada lê o processo do jogo.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#download" data-i18n="hero.cta">Baixar para Windows</a>
+          <a class="btn btn-ghost" href="#disclaimer" data-i18n="hero.secondary">Não é cheat</a>
+        </div>
+      </div>
+      <figure class="hero-media">
+        <img src="assets/app-sample.png" alt="Phasmo Hunt overlay" width="1280" height="800" />
+        <figcaption data-i18n="hero.caption">Prévia do overlay em uso</figcaption>
+      </figure>
+    </section>
+
+    <section id="features" class="section reveal">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="features.eyebrow">INVESTIGATION TOOLS</p>
+        <h2 data-i18n="features.title">O que o Phasmo Hunt faz</h2>
+        <p class="section-sub" data-i18n="features.sub">Assistente Always-On-Top para a comunidade — catálogo offline, atalhos globais, zero acesso ao jogo.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <h3 data-i18n="features.speed.title">Velocidade dos passos</h3>
+          <p data-i18n="features.speed.body">Registre passos com a tecla 1 ou o botão lateral. Após 3s sem cliques, a leitura fecha sozinha em 3 médias (±0,10 m/s).</p>
+        </article>
+        <article class="feature-card">
+          <h3 data-i18n="features.evidence.title">Evidências + catálogo</h3>
+          <p data-i18n="features.evidence.body">Filtre 30 fantasmas por evidência e velocidade. The Mimic inclui Orb falsa, como no jogo.</p>
+        </article>
+        <article class="feature-card">
+          <h3 data-i18n="features.pec.title">Peculiaridades</h3>
+          <p data-i18n="features.pec.body">Shift+1 Demon cooldown, Shift+2 Incenso (3 min), Shift+3 ciclo Obambo paz/agressivo.</p>
+        </article>
+        <article class="feature-card">
+          <h3 data-i18n="features.ui.title">Overlay compacto</h3>
+          <p data-i18n="features.ui.body">Janela por cima do jogo, modo compacto, transparência e escala salvos localmente.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="how" class="section reveal">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="how.eyebrow">FIELD GUIDE</p>
+        <h2 data-i18n="how.title">Como usar em caçada</h2>
+        <p class="section-sub" data-i18n="how.sub">Fluxo rápido para uma leitura de velocidade confiável.</p>
+      </div>
+      <ol class="steps">
+        <li>
+          <span class="step-num">01</span>
+          <div>
+            <h3 data-i18n="how.s1.title">Ouça os passos</h3>
+            <p data-i18n="how.s1.body">Pressione 1 ou o botão lateral do mouse a cada passo (mínimo útil: 6 cliques).</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">02</span>
+          <div>
+            <h3 data-i18n="how.s2.title">Espere 3 segundos</h3>
+            <p data-i18n="how.s2.body">Sem novos toques, a leitura finaliza e divide em P1 / P2 / P3.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">03</span>
+          <div>
+            <h3 data-i18n="how.s3.title">Confira os candidatos</h3>
+            <p data-i18n="how.s3.body">Veja média, padrão (estável/acelerando/…) e fantasmas compatíveis.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">04</span>
+          <div>
+            <h3 data-i18n="how.s4.title">Marque evidências</h3>
+            <p data-i18n="how.s4.body">Refine o filtro e use peculiaridades (Shift+1/2/3) conforme a investigação.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section id="download" class="section download-section reveal">
+      <div class="download-panel">
+        <p class="eyebrow" data-i18n="download.eyebrow">RELEASE</p>
+        <h2 data-i18n="download.title">Baixe o overlay</h2>
+        <p class="section-sub" data-i18n="download.sub">Windows · .NET 8 · funciona offline. Link do binário em breve — o botão já está pronto para receber a URL.</p>
+        <a class="btn btn-primary btn-lg" href="#download" data-i18n="download.cta">Baixar para Windows</a>
+        <ul class="download-meta">
+          <li data-i18n="download.meta1">Sem instalador complexo — execute e investigue</li>
+          <li data-i18n="download.meta2">Catálogo embutido; não precisa de internet na partida</li>
+          <li data-i18n="download.meta3">Código aberto no repositório do projeto</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="disclaimer" class="section reveal">
+      <div class="disclaimer-panel">
+        <p class="eyebrow" data-i18n="disclaimer.eyebrow">CLEARANCE</p>
+        <h2 data-i18n="disclaimer.title">O que esta aplicação NÃO faz</h2>
+        <ul class="disclaimer-list">
+          <li data-i18n="disclaimer.i1">Não lê memória do jogo</li>
+          <li data-i18n="disclaimer.i2">Não acessa processos do Phasmophobia</li>
+          <li data-i18n="disclaimer.i3">Não faz hooking gráfico / injeção de DLL</li>
+          <li data-i18n="disclaimer.i4">Não captura áudio ou tela do jogo</li>
+          <li data-i18n="disclaimer.i5">Não automatiza ações no jogo</li>
+        </ul>
+        <p class="disclaimer-note" data-i18n="disclaimer.note">É um overlay de apoio manual — não é cheat client. Toda informação é inserida por você.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-brand">
+      <img src="assets/app-icon.png" alt="" width="28" height="28" />
+      <span>Phasmo Hunt</span>
+    </div>
+    <p data-i18n="footer.copy">Ferramenta da comunidade para Phasmophobia. Não afiliada à Kinetic Games nem ao Phasmophobia.</p>
+  </footer>
+
+  <script src="js/app.js" defer></script>
+</body>
+</html>
