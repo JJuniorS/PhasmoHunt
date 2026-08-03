@@ -1,5 +1,7 @@
 # Phasmo Hunt
 
+**Idioma / Language:** [Português](README.md) | [English](README.en.md)
+
 Assistente manual externo para **Phasmophobia** — overlay Always-On-Top no Windows (.NET 8 + WPF).
 
 Ajuda a identificar o fantasma medindo a velocidade dos passos, cruzando com evidências e acompanhando peculiaridades de caçada. **Toda informação é inserida por você** (atalhos / interface). Nada é lido do processo do jogo.
@@ -120,31 +122,6 @@ src/website/    # Landing page (GitHub Pages)
 | Histórico de versões | [CHANGELOG.md](CHANGELOG.md) + [GitHub Releases](https://github.com/JJuniorS/PhasmoHunt/releases) (tags `v*`) |
 
 O botão de download do site lê `release.json` em runtime. Enquanto `downloadUrl` estiver vazio, o CTA fica como “em breve”.
-
-### Publicar uma nova versão do app
-
-1. Atualize a versão em `src/PhasmoHunt/PhasmoHunt.csproj` e em `src/website/release.json`.
-2. Documente as mudanças em `CHANGELOG.md`.
-3. Gere o zip do publish localmente, envie ao Drive (ou outro host) e cole o link em `downloadUrl` no `release.json`.
-4. Commit, merge em `main` (atualiza o site) e crie a tag:
-
-```bash
-git tag v1.1.0
-git push origin v1.1.0
-```
-
-O workflow **App release** cria a GitHub Release com notas a partir do CHANGELOG (histórico de versões no GitHub; o binário continua no provedor externo).
-
-### Deploy do site
-
-1. **Uma vez** (obrigatório — o Actions não consegue criar o site sozinho):
-   - Abra [Settings → Pages](https://github.com/JJuniorS/PhasmoHunt/settings/pages)
-   - Em **Build and deployment → Source**, escolha **GitHub Actions**
-2. Push em `main` com alterações em `src/website/**`, ou **Actions → Deploy website → Run workflow**
-3. URL típica: `https://jjuniorS.github.io/PhasmoHunt/`
-
-Se o job falhar com *Resource not accessible by integration*: o Pages ainda não está com Source = GitHub Actions (passo 1).
-
 
 ---
 
