@@ -212,17 +212,20 @@
                                   VerticalAlignment="Center"
                                   Margin="8,0,0,0" />
                     </DockPanel>
-                    <ScrollViewer VerticalScrollBarVisibility="Disabled"
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled">
-                        <ItemsControl ItemsSource="{Binding Ghosts}">
+                        <!-- Vertical scroll Auto: conteúdo mede altura natural.
+                             Com Disabled, o UniformGrid esticava as linhas com poucos fantasmas. -->
+                        <ItemsControl ItemsSource="{Binding Ghosts}"
+                                      VerticalAlignment="Top">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <UniformGrid Columns="3" />
+                                    <UniformGrid Columns="3" VerticalAlignment="Top" />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Padding="4,3" Margin="1">
+                                    <Border Padding="4,3" Margin="1" VerticalAlignment="Top">
                                         <StackPanel>
                                             <Button Command="{Binding ToggleEligibilityCommand}"
                                                     Cursor="Hand"
