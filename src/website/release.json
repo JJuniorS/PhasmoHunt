@@ -2,10 +2,10 @@
   "version": "1.1.0",
   "tag": "v1.1.0",
   "publishedAt": "2026-08-03",
-  "fileName": "PhasmoHunt-1.1.0-win-x64.zip",
-  "downloadUrl": "",
+  "fileName": "v1.1.0.zip",
+  "downloadUrl": "https://drive.google.com/uc?export=download&id=1KO0FmhzbT9d77r8e6Q4rK7JmiwFtlq3L",
   "platform": "Windows x64",
-  "requires": ".NET 8 Desktop Runtime (or self-contained build)",
+  "requires": "Windows 10/11 x64",
   "githubReleasesUrl": "https://github.com/JJuniorS/PhasmoHunt/releases",
   "changelogUrl": "https://github.com/JJuniorS/PhasmoHunt/blob/main/CHANGELOG.md",
   "notes": {
