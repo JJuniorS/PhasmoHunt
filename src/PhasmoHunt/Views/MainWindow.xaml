@@ -47,14 +47,14 @@
                 <TextBlock Text="Phasmo Hunt" Style="{StaticResource TitleText}" VerticalAlignment="Center" />
                 <Button Grid.Column="1"
                         Content="⚙"
-                        ToolTip="Configurações"
+                        ToolTip="{Binding Loc.Settings}"
                         Style="{StaticResource SecondaryButton}"
                         Margin="0,0,8,0"
                         Padding="10,6"
                         Click="SettingsButton_OnClick" />
                 <Button Grid.Column="2"
                         Content="{Binding CompactToggleGlyph}"
-                        ToolTip="Minimizar / Expandir"
+                        ToolTip="{Binding Loc.CompactToggle}"
                         Style="{StaticResource SecondaryButton}"
                         Margin="0,0,8,0"
                         Padding="10,6"
@@ -82,12 +82,12 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Margin="0,0,6,0">
-                        <TextBlock Text="Média geral" Style="{StaticResource MetricLabel}" />
+                        <TextBlock Text="{Binding Loc.AverageOverall}" Style="{StaticResource MetricLabel}" />
                         <TextBlock Text="{Binding SpeedText}" FontSize="18" FontWeight="SemiBold"
                                    Foreground="{StaticResource SuccessBrush}" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Margin="0,0,6,0">
-                        <TextBlock Text="Confiança" Style="{StaticResource MetricLabel}" />
+                        <TextBlock Text="{Binding Loc.Confidence}" Style="{StaticResource MetricLabel}" />
                         <TextBlock Text="{Binding ConfidenceText}" FontSize="18" FontWeight="SemiBold" />
                     </StackPanel>
                     <StackPanel Grid.Column="2" Margin="0,0,6,0">
@@ -109,20 +109,21 @@
             <DockPanel Grid.Row="2" Margin="0,0,0,8" LastChildFill="False"
                        Visibility="{Binding IsUiCompact, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}">
                 <WrapPanel DockPanel.Dock="Right">
-                    <Button Content="Passo"
+                    <Button Content="{Binding Loc.Step}"
                             Style="{StaticResource PrimaryButton}"
                             Margin="0,0,6,0"
                             Padding="10,6"
                             Command="{Binding RecordStepCommand}" />
-                    <Button Content="Evidências"
+                    <Button Content="{Binding Loc.Evidences}"
                             Style="{StaticResource SecondaryButton}"
                             Margin="0,0,6,0"
                             Padding="10,6"
                             Command="{Binding ToggleEvidencePanelCommand}" />
-                    <Button Content="Limpar"
+                    <Button Content="{Binding Loc.Clear}"
                             Style="{StaticResource DangerButton}"
                             Margin="0"
                             Padding="10,6"
+                            ToolTip="{Binding Loc.ClearHotkeyHint}"
                             Command="{Binding ClearCommand}" />
                 </WrapPanel>
                 <StackPanel VerticalAlignment="Center" Margin="0,0,8,0">
@@ -168,7 +169,7 @@
                     Visibility="{Binding ShowEvidencePanel, Converter={StaticResource BoolToVis}}">
                 <StackPanel>
                     <DockPanel Margin="0,0,0,8">
-                        <TextBlock Text="Evidências encontradas" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding Loc.EvidencesFound}" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </DockPanel>
                     <ItemsControl ItemsSource="{Binding EvidenceOptions}">
                         <ItemsControl.ItemsPanel>
@@ -191,7 +192,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                     <TextBlock Style="{StaticResource MutedText}" FontSize="11" TextWrapping="Wrap"
-                               Text="Filtra fantasmas junto com a velocidade. Mimic inclui Orb falsa." />
+                               Text="{Binding Loc.EvidencesHint}" />
                 </StackPanel>
             </Border>
 
@@ -204,13 +205,12 @@
                     Visibility="{Binding IsUiCompact, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}">
                 <DockPanel>
                     <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6">
-                        <TextBlock Text="Fantasmas" FontWeight="SemiBold" VerticalAlignment="Center" />
-                        <TextBlock DockPanel.Dock="Right"
-                                   Text="verde apto · vermelho fora"
-                                   Style="{StaticResource MutedText}"
-                                   FontSize="11"
-                                   HorizontalAlignment="Right"
-                                   VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding Loc.Ghosts}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <CheckBox DockPanel.Dock="Right"
+                                  IsChecked="{Binding HideIneligibleGhosts, Mode=TwoWay}"
+                                  ToolTip="{Binding Loc.HideIneligibleHint}"
+                                  VerticalAlignment="Center"
+                                  Margin="8,0,0,0" />
                     </DockPanel>
                     <ScrollViewer VerticalScrollBarVisibility="Disabled"
                                   HorizontalScrollBarVisibility="Disabled">
@@ -224,15 +224,28 @@
                                 <DataTemplate>
                                     <Border Padding="4,3" Margin="1">
                                         <StackPanel>
-                                            <TextBlock FontSize="11" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis">
-                                                <Run Text="{Binding Name, Mode=OneWay}"
-                                                     FontWeight="SemiBold"
-                                                     Foreground="{Binding StatusBrush}" />
-                                                <Run Text=" " />
-                                                <Run Text="{Binding SpeedRangeText, Mode=OneWay}"
-                                                     Foreground="{Binding StatusBrush}"
-                                                     FontSize="10" />
-                                            </TextBlock>
+                                            <Button Command="{Binding ToggleEligibilityCommand}"
+                                                    Cursor="Hand"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Padding="0"
+                                                    HorizontalContentAlignment="Left"
+                                                    ToolTip="{Binding DataContext.Loc.GhostToggleTip, RelativeSource={RelativeSource AncestorType=Window}}">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <ContentPresenter />
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                                <TextBlock FontSize="11" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis">
+                                                    <Run Text="{Binding Name, Mode=OneWay}"
+                                                         FontWeight="SemiBold"
+                                                         Foreground="{Binding StatusBrush}" />
+                                                    <Run Text=" " />
+                                                    <Run Text="{Binding SpeedRangeText, Mode=OneWay}"
+                                                         Foreground="{Binding StatusBrush}"
+                                                         FontSize="10" />
+                                                </TextBlock>
+                                            </Button>
                                             <ItemsControl ItemsSource="{Binding EvidenceIcons}" Margin="0,2,0,0">
                                                 <ItemsControl.ItemsPanel>
                                                     <ItemsPanelTemplate>
@@ -274,7 +287,7 @@
                         Padding="8"
                         MaxHeight="180">
                     <StackPanel>
-                        <TextBlock Text="Peculiaridades" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,8" />
+                        <TextBlock Text="{Binding Loc.Peculiarities}" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,8" />
                         <WrapPanel>
                             <Border HorizontalAlignment="Left" Margin="0,0,8,8">
                                 <Border.Style>
@@ -366,7 +379,7 @@
                         MaxHeight="140">
                     <DockPanel>
                         <DockPanel DockPanel.Dock="Top" Margin="0,0,0,4">
-                            <TextBlock Text="Leituras" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding Loc.Readings}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" />
                         </DockPanel>
                         <ListBox ItemsSource="{Binding History}"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"

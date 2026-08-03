@@ -18,6 +18,12 @@ public sealed class AppSettings
 
     public double GhostSpeedPercent { get; set; } = 100;
 
+    /// <summary>UI language code: "pt-BR" (default) or "en".</summary>
+    public string Language { get; set; } = "pt-BR";
+
+    /// <summary>When true, ghosts marked ineligible (red) are hidden from the list.</summary>
+    public bool HideIneligibleGhosts { get; set; }
+
     public HotkeyBinding StepHotkey { get; set; } = new(DefaultStepVk);
     public HotkeyBinding DemonCooldownHotkey { get; set; } = new(DefaultDemonVk, ModShift);
     public HotkeyBinding IncenseTimerHotkey { get; set; } = new(DefaultIncenseVk, ModShift);
@@ -40,6 +46,8 @@ public sealed class AppSettings
             UiScale = UiScale,
             Theme = Theme,
             GhostSpeedPercent = GhostSpeedPercent,
+            Language = Language,
+            HideIneligibleGhosts = HideIneligibleGhosts,
             StepHotkey = StepHotkey.Clone(),
             DemonCooldownHotkey = DemonCooldownHotkey.Clone(),
             IncenseTimerHotkey = IncenseTimerHotkey.Clone(),

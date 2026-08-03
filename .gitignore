@@ -8,3 +8,9 @@ AppData/
 dist/
 docs/*
 .superpowers/
+
+# Local packaging — binário vai para Drive; versões via GitHub Releases
+publish/
+*.zip
+*.exe
+*.pdb

@@ -201,13 +201,7 @@ public sealed class SpeedCalculatorService
     private static string PatternToText(SpeedPattern pattern, IReadOnlyList<SpeedSegment> segments)
     {
         var parts = string.Join(" → ", segments.Select(s => $"{s.EstimatedSpeedMps:F2}"));
-        return pattern switch
-        {
-            SpeedPattern.Stable => $"Estável ({parts})",
-            SpeedPattern.Accelerating => $"Acelerando ({parts})",
-            SpeedPattern.Decelerating => $"Desacelerando ({parts})",
-            _ => $"Irregular ({parts})"
-        };
+        return LocalizationService.Instance.PatternText(pattern, parts);
     }
 
     private static IReadOnlyList<GhostInfo> MatchGhosts(

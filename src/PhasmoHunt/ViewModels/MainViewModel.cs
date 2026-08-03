@@ -23,6 +23,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly SessionComparisonService _sessionComparison = new();
     private readonly SettingsService _settingsService;
     private readonly HotkeyService _hotkeyService;
+    private readonly List<GhostListItemViewModel> _allGhosts = new();
     private readonly List<TimeSpan> _stepTimestamps = new();
     private readonly List<SpeedMeasurement> _sessionReadings = new();
     private readonly Stopwatch _sessionWatch = new();
@@ -45,6 +46,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var settings = _settingsService.Load();
         Opacity = settings.Opacity;
         UiScale = settings.UiScale;
+        HideIneligibleGhosts = settings.HideIneligibleGhosts;
+        LocalizationService.Instance.SetLanguage(settings.Language);
 
         _uiTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
         _uiTimer.Tick += OnUiTimerTick;
@@ -72,12 +75,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         foreach (var ghost in _ghostCatalog.GetAll().OrderBy(g => g.Name, StringComparer.OrdinalIgnoreCase))
         {
-            Ghosts.Add(new GhostListItemViewModel(ghost));
+            var item = new GhostListItemViewModel(ghost, OnGhostEligibilityChanged);
+            _allGhosts.Add(item);
+            Ghosts.Add(item);
         }
 
         ApplySpeedFactorToGhostList();
 
-        CatalogCountText = $"{Ghosts.Count} fantasmas no catálogo";
+        CatalogCountText = LocalizationService.Instance.Format("catalog_count", _allGhosts.Count);
         foreach (var evidence in EvidenceTypeExtensions.All)
         {
             EvidenceOptions.Add(new EvidenceOptionViewModel(evidence, OnEvidenceSelectionChanged));
@@ -86,7 +91,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
         ResetDisplay();
         RefreshSessionComparison();
         RefreshGhostEligibility();
+        LocalizationService.Instance.LanguageChanged += OnLanguageChanged;
     }
+
+    public LocalizationService Loc => LocalizationService.Instance;
 
     public ObservableCollection<HistoryItemViewModel> History { get; } = new();
     public ObservableCollection<GhostListItemViewModel> Ghosts { get; } = new();
@@ -126,6 +134,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty] private System.Windows.Media.ImageSource? _incenseIcon;
     [ObservableProperty] private string _incenseTimerText = "--:--";
     [ObservableProperty] private bool _isIncenseRunning;
+    [ObservableProperty] private bool _hideIneligibleGhosts;
 
     public string CompactToggleGlyph => IsUiCompact ? "▢" : "─";
 
@@ -157,6 +166,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _settingsService.SaveDebounced(settings);
     }
 
+    partial void OnHideIneligibleGhostsChanged(bool value)
+    {
+        var settings = _settingsService.Current;
+        settings.HideIneligibleGhosts = value;
+        _settingsService.SaveDebounced(settings);
+        ResortGhosts();
+    }
+
     partial void OnSessionStateChanged(MeasurementSessionState value)
     {
         OnPropertyChanged(nameof(CanFinish));
@@ -169,11 +186,54 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         var perPart = SpeedCalculatorService.StepsPerSegment(value);
         var usable = SpeedCalculatorService.UsableStepCount(value);
+        var loc = LocalizationService.Instance;
         StepCountText = perPart >= SpeedCalculatorService.MinStepsPerSegment
-            ? $"{value} passos · {perPart}/parte ({usable} usados)"
-            : $"{value} passos · mín. {SpeedCalculatorService.MinTotalSteps}";
+            ? loc.Format("steps_count", value, perPart, usable)
+            : loc.Format("steps_min", value, SpeedCalculatorService.MinTotalSteps);
         OnPropertyChanged(nameof(CanFinish));
         FinishCommand.NotifyCanExecuteChanged();
+    }
+
+    private void OnLanguageChanged()
+    {
+        OnPropertyChanged(nameof(Loc));
+        foreach (var option in EvidenceOptions)
+        {
+            option.RefreshDisplayName();
+        }
+
+        CatalogCountText = LocalizationService.Instance.Format("catalog_count", _allGhosts.Count);
+        OnStepCountChanged(StepCount);
+        RefreshHotkeyLabels();
+
+        // Rebuild pattern texts stored on readings for current language.
+        for (var i = 0; i < _sessionReadings.Count; i++)
+        {
+            var m = _sessionReadings[i];
+            var parts = string.Join(" → ", m.Segments.Select(s => $"{s.EstimatedSpeedMps:F2}"));
+            _sessionReadings[i] = new SpeedMeasurement
+            {
+                RecordedAt = m.RecordedAt,
+                StepTimestamps = m.StepTimestamps,
+                TotalTime = m.TotalTime,
+                AverageIntervalSeconds = m.AverageIntervalSeconds,
+                StepsPerSecond = m.StepsPerSecond,
+                EstimatedSpeedMps = m.EstimatedSpeedMps,
+                ConfidencePercent = m.ConfidencePercent,
+                Segments = m.Segments,
+                Pattern = m.Pattern,
+                PatternText = LocalizationService.Instance.PatternText(m.Pattern, parts),
+                CompatibleGhosts = m.CompatibleGhosts
+            };
+        }
+
+        if (_sessionReadings.Count > 0)
+        {
+            ApplyMeasurement(_sessionReadings[0]);
+            RebuildHistory();
+        }
+
+        RefreshSessionComparison();
     }
 
     public void AttachHotkeys(Window window)
@@ -206,6 +266,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var settings = _settingsService.Current;
         Opacity = settings.Opacity;
         UiScale = settings.UiScale;
+        HideIneligibleGhosts = settings.HideIneligibleGhosts;
+        LocalizationService.Instance.SetLanguage(settings.Language);
         ApplySpeedFactorToGhostList();
         RematchSessionReadings();
         ApplyHotkeysFromSettings();
@@ -222,7 +284,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private void ApplySpeedFactorToGhostList()
     {
         var factor = GhostSpeedFactor;
-        foreach (var item in Ghosts)
+        foreach (var item in _allGhosts)
         {
             item.ApplySpeedFactor(factor);
         }
@@ -290,6 +352,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
             option.IsSelected = false;
         }
 
+        foreach (var ghost in _allGhosts)
+        {
+            ghost.ClearManualOverride();
+        }
+
         RefreshEvidenceSummary();
 
         _sessionReadings.Clear();
@@ -315,6 +382,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _idleTimer.Tick -= OnIdleTimerTick;
         _peculiarityUiTimer.Tick -= OnPeculiarityUiTimerTick;
         _hotkeyService.HotkeyPressed -= OnHotkeyPressed;
+        LocalizationService.Instance.LanguageChanged -= OnLanguageChanged;
         _hotkeyService.Dispose();
     }
 
@@ -423,6 +491,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     break;
                 case HotkeyAction.IncenseTimer:
                     StartOrResetIncenseTimer();
+                    break;
+                case HotkeyAction.Clear:
+                    ClearCommand.Execute(null);
                     break;
             }
         });
@@ -614,7 +685,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Part3Text = FormatPart(measurement.Segments[2]);
         PatternText = measurement.PatternText;
         CompatibleGhostsText = measurement.CompatibleGhosts.Count == 0
-            ? "Nenhum no catálogo atual"
+            ? LocalizationService.Instance.T("no_catalog_match")
             : string.Join(", ", measurement.CompatibleGhosts.Select(g => $"{g.Name} ({g.FormatSpeedRange(GhostSpeedFactor)})"));
         ElapsedText = TotalTimeText;
         StepCount = measurement.StepTimestamps.Count;
@@ -666,7 +737,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         if (!hasSpeedFilter && !hasEvidenceFilter && !hasPeculiarityFilter)
         {
-            foreach (var item in Ghosts)
+            foreach (var item in _allGhosts)
             {
                 item.SetEligibility(null);
             }
@@ -675,7 +746,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        foreach (var item in Ghosts)
+        foreach (var item in _allGhosts)
         {
             var speedOk = !hasSpeedFilter || speedEligibleIds!.Contains(item.Ghost.Id);
             var evidenceOk = !hasEvidenceFilter || item.Ghost.MatchesEvidence(selectedEvidence);
@@ -692,6 +763,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         RefreshGhostEligibility();
     }
 
+    private void OnGhostEligibilityChanged() => ResortGhosts();
+
     private void RefreshEvidenceSummary()
     {
         HasSelectedEvidence = EvidenceOptions.Any(o => o.IsSelected);
@@ -699,7 +772,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private void ResortGhosts()
     {
-        var ordered = Ghosts
+        var ordered = _allGhosts
+            .Where(g => !HideIneligibleGhosts || g.IsEligible != false)
             .OrderByDescending(g => g.IsEligible == true)
             .ThenBy(g => g.IsEligible is null)
             .ThenBy(g => g.Name, StringComparer.OrdinalIgnoreCase)
@@ -739,10 +813,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
         RefreshHotkeyLabels();
         if (failed.Count > 0)
         {
+            var loc = LocalizationService.Instance;
             MessageBox.Show(
-                "Não foi possível registrar a(s) hotkey(s): " + string.Join(", ", failed) +
-                ".\nOutro aplicativo pode estar usando a mesma combinação. A preferência foi salva mesmo assim.",
-                "Phasmo Hunt",
+                loc.Format("hotkey_fail_body", string.Join(", ", failed)),
+                loc.T("hotkey_fail_title"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
         }

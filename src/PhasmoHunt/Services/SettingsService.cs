@@ -105,5 +105,7 @@ public sealed class SettingsService
         {
             settings.GhostSpeedPercent = 100;
         }
+
+        settings.Language = LocalizationService.ToCode(LocalizationService.Parse(settings.Language));
     }
 }
