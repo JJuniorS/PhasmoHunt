@@ -137,10 +137,14 @@ O workflow **App release** cria a GitHub Release com notas a partir do CHANGELOG
 
 ### Deploy do site
 
-- Push em `main` com alterações em `src/website/**`, ou execução manual do workflow **Deploy website**.
-- Na **primeira** execução o workflow tenta habilitar Pages sozinho (`enablement: true`). Se ainda falhar, faça uma vez:
-  **Settings → Pages → Build and deployment → Source: GitHub Actions** e reexecute o workflow.
-- URL típica: `https://jjuniorS.github.io/PhasmoHunt/` após o deploy.
+1. **Uma vez** (obrigatório — o Actions não consegue criar o site sozinho):
+   - Abra [Settings → Pages](https://github.com/JJuniorS/PhasmoHunt/settings/pages)
+   - Em **Build and deployment → Source**, escolha **GitHub Actions**
+2. Push em `main` com alterações em `src/website/**`, ou **Actions → Deploy website → Run workflow**
+3. URL típica: `https://jjuniorS.github.io/PhasmoHunt/`
+
+Se o job falhar com *Resource not accessible by integration*: o Pages ainda não está com Source = GitHub Actions (passo 1).
+
 
 ---
 
