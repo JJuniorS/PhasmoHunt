@@ -1,8 +1,8 @@
 {
-  "version": "1.1.0",
-  "tag": "v1.1.0",
+  "version": "1.1.1",
+  "tag": "v1.1.1",
   "publishedAt": "2026-08-03",
-  "fileName": "v1.1.0.zip",
+  "fileName": "v1.1.1.zip",
   "downloadUrl": "https://drive.google.com/file/d/1SELAnYAORc4OsK-bj2T9mjjXp4o2rtjJ/view?usp=sharing",
   "platform": "Windows x64",
   "requires": "Windows 10/11 x64",
@@ -14,8 +14,8 @@
   },
   "history": [
     {
-      "version": "1.1.0",
-      "tag": "v1.1.0",
+      "version": "1.1.1",
+      "tag": "v1.1.1",
       "publishedAt": "2026-08-03",
       "notes": {
         "pt": "Primeira release pública da comunidade.",
