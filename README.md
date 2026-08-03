@@ -102,3 +102,11 @@ src/PhasmoHunt/
   Themes/       # Tema escuro
   Assets/       # Ícones de evidências e peculiaridades
 ```
+
+---
+
+## Licença
+
+Código sob a [licença MIT](LICENSE).
+
+Phasmophobia e Kinetic Games são marcas de seus respectivos proprietários. O Phasmo Hunt é uma ferramenta não oficial da comunidade e **não é afiliado, endossado ou patrocinado** pela Kinetic Games.
