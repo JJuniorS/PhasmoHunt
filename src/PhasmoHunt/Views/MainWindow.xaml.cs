@@ -12,6 +12,9 @@ public partial class MainWindow : Window
     private bool _settingsApplied;
     private double _expandedHeight = 820;
     private double _expandedMinHeight = 640;
+    private WindowState _previousState = WindowState.Normal;
+    private Rect _preFillBounds;
+    private bool _isWorkAreaFilled;
 
     public MainWindow()
     {
@@ -25,6 +28,8 @@ public partial class MainWindow : Window
         Loaded += OnLoaded;
         LocationChanged += OnBoundsChanged;
         SizeChanged += OnBoundsChanged;
+        StateChanged += OnStateChanged;
+        Activated += OnActivated;
         Closed += OnClosed;
     }
 
@@ -87,7 +92,13 @@ public partial class MainWindow : Window
 
     private void OnBoundsChanged(object? sender, EventArgs e)
     {
-        if (!_settingsApplied || WindowState != WindowState.Normal || _viewModel.IsUiCompact)
+        if (!_settingsApplied || WindowState != WindowState.Normal || _viewModel.IsUiCompact || _isWorkAreaFilled)
+        {
+            return;
+        }
+
+        // Ignore invalid bounds while the Win32 host is minimized or mid-transition.
+        if (Left <= -10000 || Top <= -10000 || Width <= 0 || Height <= 0)
         {
             return;
         }
@@ -95,12 +106,168 @@ public partial class MainWindow : Window
         _viewModel.PersistWindowBounds(Left, Top, Width, Height);
     }
 
+    private void OnStateChanged(object? sender, EventArgs e)
+    {
+        var previous = _previousState;
+        _previousState = WindowState;
+
+        // Borderless + AllowsTransparency: true Maximize is unreliable (layout / hit-test / chrome).
+        if (WindowState == WindowState.Maximized)
+        {
+            Dispatcher.BeginInvoke(FillWorkAreaInsteadOfMaximize, DispatcherPriority.ApplicationIdle);
+            return;
+        }
+
+        // Restore after minimize often drops Topmost and leaves the composition host stale.
+        if (previous == WindowState.Minimized && WindowState == WindowState.Normal)
+        {
+            Dispatcher.BeginInvoke(() =>
+            {
+                if (_isWorkAreaFilled)
+                {
+                    var work = SystemParameters.WorkArea;
+                    Left = work.Left;
+                    Top = work.Top;
+                    Width = work.Width;
+                    Height = work.Height;
+                }
+
+                RefreshAfterRestore();
+            }, DispatcherPriority.ApplicationIdle);
+        }
+    }
+
+    private void OnActivated(object? sender, EventArgs e)
+    {
+        if (WindowState != WindowState.Minimized)
+        {
+            EnsureTopmost();
+        }
+    }
+
+    /// <summary>
+    /// Fills the monitor work area while staying in <see cref="WindowState.Normal"/>
+    /// so transparency / hit-testing keep working.
+    /// </summary>
+    private void FillWorkAreaInsteadOfMaximize()
+    {
+        if (WindowState != WindowState.Maximized)
+        {
+            return;
+        }
+
+        if (!_isWorkAreaFilled)
+        {
+            var rb = RestoreBounds;
+            if (rb.Width > 0 && rb.Height > 0)
+            {
+                _preFillBounds = new Rect(rb.Left, rb.Top, rb.Width, rb.Height);
+            }
+            else
+            {
+                _preFillBounds = new Rect(Left, Top, Width, Height);
+            }
+        }
+
+        WindowState = WindowState.Normal;
+        var work = SystemParameters.WorkArea;
+        Left = work.Left;
+        Top = work.Top;
+        Width = work.Width;
+        Height = work.Height;
+        _isWorkAreaFilled = true;
+        _previousState = WindowState.Normal;
+        RefreshAfterRestore();
+    }
+
+    private void ExitWorkAreaFillIfNeeded()
+    {
+        if (!_isWorkAreaFilled)
+        {
+            return;
+        }
+
+        _isWorkAreaFilled = false;
+        if (_preFillBounds.Width > 0 && _preFillBounds.Height > 0)
+        {
+            Left = _preFillBounds.Left;
+            Top = _preFillBounds.Top;
+            Width = _preFillBounds.Width;
+            Height = _preFillBounds.Height;
+        }
+    }
+
+    private void RefreshAfterRestore()
+    {
+        EnsureTopmost();
+
+        // Nudge layout so the DWM/transparent host resizes correctly after minimize.
+        var w = Width;
+        var h = Height;
+        if (w > 0 && h > 0)
+        {
+            Width = w + 0.5;
+            Height = h + 0.5;
+            Width = w;
+            Height = h;
+        }
+
+        InvalidateVisual();
+        UpdateLayout();
+        Opacity = _viewModel.Opacity;
+    }
+
+    private void EnsureTopmost()
+    {
+        if (!Topmost)
+        {
+            Topmost = true;
+            return;
+        }
+
+        // Toggle re-asserts Z-order with the desktop compositor after restore.
+        Topmost = false;
+        Topmost = true;
+    }
+
     private void TitleBar_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == MouseButton.Left)
+        if (e.ChangedButton != MouseButton.Left)
         {
-            DragMove();
+            return;
         }
+
+        if (e.ClickCount == 2)
+        {
+            // Double-click: toggle work-area fill (safe "fullscreen" for this window chrome).
+            if (_isWorkAreaFilled)
+            {
+                ExitWorkAreaFillIfNeeded();
+                RefreshAfterRestore();
+            }
+            else if (WindowState == WindowState.Normal)
+            {
+                _preFillBounds = new Rect(Left, Top, Width, Height);
+                var work = SystemParameters.WorkArea;
+                Left = work.Left;
+                Top = work.Top;
+                Width = work.Width;
+                Height = work.Height;
+                _isWorkAreaFilled = true;
+                RefreshAfterRestore();
+            }
+
+            e.Handled = true;
+            return;
+        }
+
+        // Dragging off a filled work area should restore prior size (like normal maximize drag-down).
+        if (_isWorkAreaFilled)
+        {
+            ExitWorkAreaFillIfNeeded();
+        }
+
+        DragMove();
     }
 
     private void SettingsButton_OnClick(object sender, RoutedEventArgs e)
@@ -123,9 +290,20 @@ public partial class MainWindow : Window
 
     private void OnClosed(object? sender, EventArgs e)
     {
-        if (WindowState == WindowState.Normal && !_viewModel.IsUiCompact)
+        if (WindowState == WindowState.Normal && !_viewModel.IsUiCompact && !_isWorkAreaFilled)
         {
-            _viewModel.PersistWindowBounds(Left, Top, Width, Height);
+            if (Left > -10000 && Top > -10000 && Width > 0 && Height > 0)
+            {
+                _viewModel.PersistWindowBounds(Left, Top, Width, Height);
+            }
+        }
+        else if (_isWorkAreaFilled && _preFillBounds.Width > 0)
+        {
+            _viewModel.PersistWindowBounds(
+                _preFillBounds.Left,
+                _preFillBounds.Top,
+                _preFillBounds.Width,
+                _preFillBounds.Height);
         }
 
         _viewModel.Dispose();
