@@ -41,7 +41,7 @@
         <h1 data-i18n="hero.title">Overlay manual para identificar o fantasma</h1>
         <p class="lede" data-i18n="hero.lede">Meça a velocidade dos passos, cruze com evidências e acompanhe peculiaridades. Tudo inserido por você — nada lê o processo do jogo.</p>
         <div class="cta-row">
-          <a class="btn btn-primary" href="#download" data-i18n="hero.cta">Baixar para Windows</a>
+          <a class="btn btn-primary" href="#download" data-i18n="hero.cta" data-download-cta>Baixar para Windows</a>
           <a class="btn btn-ghost" href="#disclaimer" data-i18n="hero.secondary">Não é cheat</a>
         </div>
       </div>
@@ -127,14 +127,16 @@
       <div class="download-panel">
         <p class="eyebrow" data-i18n="download.eyebrow">RELEASE</p>
         <h2 data-i18n="download.title">Baixe o overlay</h2>
-        <p class="section-sub" data-i18n="download.sub">Windows · .NET 8 · funciona offline. Link do binário em breve — o botão já está pronto para receber a URL.</p>
+        <p class="section-sub" data-i18n="download.sub">Windows · funciona offline. O binário é hospedado fora do GitHub; versões ficam listadas nas Releases.</p>
+        <p class="download-version" id="download-version" hidden></p>
         <div class="cta-row download-ctas">
-          <a class="btn btn-primary btn-lg" href="#download" data-i18n="download.cta">Baixar para Windows</a>
+          <a class="btn btn-primary btn-lg" id="download-btn" href="#download" data-i18n="download.cta" data-download-cta>Baixar para Windows</a>
           <a class="btn btn-ghost btn-lg"
-             href="https://github.com/JJuniorS/PhasmoHunt"
+             id="releases-btn"
+             href="https://github.com/JJuniorS/PhasmoHunt/releases"
              target="_blank"
              rel="noopener noreferrer"
-             data-i18n="download.github">Ver no GitHub</a>
+             data-i18n="download.releases">Versões no GitHub</a>
         </div>
         <ul class="download-meta">
           <li data-i18n="download.meta1">Sem instalador complexo — execute e investigue</li>

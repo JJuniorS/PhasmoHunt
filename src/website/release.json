@@ -1,0 +1,26 @@
+{
+  "version": "1.1.0",
+  "tag": "v1.1.0",
+  "publishedAt": "2026-08-03",
+  "fileName": "PhasmoHunt-1.1.0-win-x64.zip",
+  "downloadUrl": "",
+  "platform": "Windows x64",
+  "requires": ".NET 8 Desktop Runtime (or self-contained build)",
+  "githubReleasesUrl": "https://github.com/JJuniorS/PhasmoHunt/releases",
+  "changelogUrl": "https://github.com/JJuniorS/PhasmoHunt/blob/main/CHANGELOG.md",
+  "notes": {
+    "pt": "Primeira release pública da comunidade.",
+    "en": "First public community release."
+  },
+  "history": [
+    {
+      "version": "1.1.0",
+      "tag": "v1.1.0",
+      "publishedAt": "2026-08-03",
+      "notes": {
+        "pt": "Primeira release pública da comunidade.",
+        "en": "First public community release."
+      }
+    }
+  ]
+}

@@ -53,9 +53,11 @@
       "download.eyebrow": "RELEASE",
       "download.title": "Baixe o overlay",
       "download.sub":
-        "Windows · .NET 8 · funciona offline. Link do binário em breve — o botão já está pronto para receber a URL.",
+        "Windows · funciona offline. O binário é hospedado fora do GitHub; o histórico de versões fica nas Releases.",
       "download.cta": "Baixar para Windows",
-      "download.github": "Ver no GitHub",
+      "download.cta.soon": "Download em breve",
+      "download.releases": "Versões no GitHub",
+      "download.version": "Versão {version} · {platform}",
       "download.meta1": "Sem instalador complexo — execute e investigue",
       "download.meta2": "Catálogo embutido; não precisa de internet na partida",
       "download.meta3": "Código aberto em github.com/JJuniorS/PhasmoHunt",
@@ -123,9 +125,11 @@
       "download.eyebrow": "RELEASE",
       "download.title": "Download the overlay",
       "download.sub":
-        "Windows · .NET 8 · works offline. Binary link coming soon — the button is ready for the URL.",
+        "Windows · works offline. The binary is hosted outside GitHub; version history lives in Releases.",
       "download.cta": "Download for Windows",
-      "download.github": "View on GitHub",
+      "download.cta.soon": "Download coming soon",
+      "download.releases": "Versions on GitHub",
+      "download.version": "Version {version} · {platform}",
       "download.meta1": "No heavy installer — run and investigate",
       "download.meta2": "Embedded catalog; no internet needed in-match",
       "download.meta3": "Open source at github.com/JJuniorS/PhasmoHunt",
@@ -144,6 +148,14 @@
     },
   };
 
+  let releaseInfo = null;
+  let currentLang = "pt";
+
+  function t(key, fallback) {
+    const dict = strings[currentLang] || strings.pt;
+    return dict[key] != null ? dict[key] : fallback ?? key;
+  }
+
   function applyI18n(lang) {
     const dict = strings[lang] || strings.pt;
     document.querySelectorAll("[data-i18n]").forEach((el) => {
@@ -152,10 +164,12 @@
         el.textContent = dict[key];
       }
     });
+    applyReleaseUi();
   }
 
   function setLang(lang) {
     const next = lang === "en" ? "en" : "pt";
+    currentLang = next;
     document.documentElement.lang = next;
     localStorage.setItem(STORAGE_KEY, next);
     applyI18n(next);
@@ -178,11 +192,74 @@
     });
   }
 
+  function hasDownloadUrl() {
+    return Boolean(releaseInfo && releaseInfo.downloadUrl && releaseInfo.downloadUrl.trim());
+  }
+
+  function applyReleaseUi() {
+    const versionEl = document.getElementById("download-version");
+    const releasesBtn = document.getElementById("releases-btn");
+    const ctas = document.querySelectorAll("[data-download-cta]");
+
+    if (releaseInfo) {
+      if (versionEl) {
+        versionEl.hidden = false;
+        versionEl.textContent = t("download.version")
+          .replace("{version}", releaseInfo.version || "—")
+          .replace("{platform}", releaseInfo.platform || "Windows");
+      }
+
+      if (releasesBtn && releaseInfo.githubReleasesUrl) {
+        releasesBtn.href = releaseInfo.githubReleasesUrl;
+      }
+    }
+
+    const ready = hasDownloadUrl();
+    ctas.forEach((btn) => {
+      if (ready) {
+        btn.href = releaseInfo.downloadUrl;
+        btn.removeAttribute("aria-disabled");
+        btn.classList.remove("is-disabled");
+        if (btn.hasAttribute("data-i18n")) {
+          btn.setAttribute("data-i18n", "download.cta");
+        }
+        btn.textContent = t("download.cta");
+        btn.target = "_blank";
+        btn.rel = "noopener noreferrer";
+      } else {
+        btn.href = "#download";
+        btn.removeAttribute("target");
+        btn.removeAttribute("rel");
+        btn.setAttribute("aria-disabled", "true");
+        btn.classList.add("is-disabled");
+        if (btn.hasAttribute("data-i18n")) {
+          btn.setAttribute("data-i18n", "download.cta.soon");
+        }
+        btn.textContent = t("download.cta.soon");
+      }
+    });
+  }
+
+  async function initRelease() {
+    try {
+      const res = await fetch("release.json", { cache: "no-cache" });
+      if (!res.ok) throw new Error(`release.json ${res.status}`);
+      releaseInfo = await res.json();
+    } catch {
+      releaseInfo = null;
+    }
+    applyReleaseUi();
+  }
+
   function initSmoothScroll() {
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
       anchor.addEventListener("click", (event) => {
+        if (anchor.getAttribute("aria-disabled") === "true") {
+          event.preventDefault();
+          return;
+        }
         const id = anchor.getAttribute("href");
-        if (!id || id === "#") return;
+        if (!id || id === "#" || !id.startsWith("#")) return;
         const target = document.querySelector(id);
         if (!target) return;
         event.preventDefault();
@@ -216,5 +293,6 @@
     initLangButtons();
     initSmoothScroll();
     initReveal();
+    initRelease();
   });
 })();

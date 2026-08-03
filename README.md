@@ -101,7 +101,45 @@ src/PhasmoHunt/
   Views/        # MainWindow (WPF)
   Themes/       # Tema escuro
   Assets/       # Ícones de evidências e peculiaridades
+src/website/    # Landing page (GitHub Pages)
 ```
+
+### Assets / ícones
+
+Ícones de evidência, peculiaridades e do app foram **criados para este projeto** (arte gerada com IA / original). Não incluem assets oficiais do Phasmophobia nem da Kinetic Games.
+
+---
+
+## Site e download
+
+| O quê | Onde |
+|-------|------|
+| Site estático | `src/website/` |
+| Deploy | GitHub Actions → **GitHub Pages** (workflow `Deploy website`) |
+| Link do binário | campo `downloadUrl` em [`src/website/release.json`](src/website/release.json) (Google Drive, etc.) |
+| Histórico de versões | [CHANGELOG.md](CHANGELOG.md) + [GitHub Releases](https://github.com/JJuniorS/PhasmoHunt/releases) (tags `v*`) |
+
+O botão de download do site lê `release.json` em runtime. Enquanto `downloadUrl` estiver vazio, o CTA fica como “em breve”.
+
+### Publicar uma nova versão do app
+
+1. Atualize a versão em `src/PhasmoHunt/PhasmoHunt.csproj` e em `src/website/release.json`.
+2. Documente as mudanças em `CHANGELOG.md`.
+3. Gere o zip do publish localmente, envie ao Drive (ou outro host) e cole o link em `downloadUrl` no `release.json`.
+4. Commit, merge em `main` (atualiza o site) e crie a tag:
+
+```bash
+git tag v1.1.0
+git push origin v1.1.0
+```
+
+O workflow **App release** cria a GitHub Release com notas a partir do CHANGELOG (histórico de versões no GitHub; o binário continua no provedor externo).
+
+### Deploy do site
+
+- Push em `main` com alterações em `src/website/**`, ou execução manual do workflow **Deploy website**.
+- Uma vez no repositório: **Settings → Pages → Source: GitHub Actions**.
+- URL típica: `https://jjuniorS.github.io/PhasmoHunt/` (Settings → Pages após o primeiro deploy).
 
 ---
 

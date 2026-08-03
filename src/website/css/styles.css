@@ -244,6 +244,21 @@ h3 {
   font-size: 1rem;
 }
 
+.download-version {
+  margin: 0 0 1rem;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+.btn.is-disabled,
+a.btn.is-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .download-ctas {
   margin-top: 1.25rem;
   margin-bottom: 0.25rem;
