@@ -52,17 +52,26 @@
             <StackPanel Grid.Row="1">
                 <TextBlock Text="{Binding Loc.LanguageLabel}" Style="{StaticResource MutedText}" />
                 <StackPanel Orientation="Horizontal" Margin="0,6,0,12">
-                    <ToggleButton Content="🇧🇷"
-                                  Style="{StaticResource LanguageFlagButton}"
+                    <ToggleButton Style="{StaticResource LanguageFlagButton}"
                                   IsChecked="{Binding IsLanguagePtBr, Mode=OneWay}"
                                   ToolTip="Português (Brasil)"
-                                  Click="PtBrFlag_OnClick" />
-                    <ToggleButton Content="EN"
-                                  Style="{StaticResource LanguageFlagButton}"
-                                  FontSize="14"
+                                  Click="PtBrFlag_OnClick">
+                        <Image Source="pack://application:,,,/Assets/pt-Br.png"
+                               Width="28"
+                               Height="20"
+                               Stretch="Uniform"
+                               RenderOptions.BitmapScalingMode="HighQuality" />
+                    </ToggleButton>
+                    <ToggleButton Style="{StaticResource LanguageFlagButton}"
                                   IsChecked="{Binding IsLanguageEn, Mode=OneWay}"
                                   ToolTip="English"
-                                  Click="EnFlag_OnClick" />
+                                  Click="EnFlag_OnClick">
+                        <Image Source="pack://application:,,,/Assets/en.png"
+                               Width="28"
+                               Height="20"
+                               Stretch="Uniform"
+                               RenderOptions.BitmapScalingMode="HighQuality" />
+                    </ToggleButton>
                 </StackPanel>
 
                 <TextBlock Text="{Binding Loc.Opacity}" Style="{StaticResource MutedText}" />
@@ -83,6 +92,11 @@
                 <TextBlock Text="{Binding Loc.GhostSpeedPercent}" Style="{StaticResource MutedText}" />
                 <TextBox Text="{Binding GhostSpeedPercentText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          Margin="0,4,0,12" />
+
+                <CheckBox Content="{Binding Loc.HideIneligible}"
+                          IsChecked="{Binding HideIneligibleGhosts, Mode=TwoWay}"
+                          ToolTip="{Binding Loc.HideIneligibleHint}"
+                          Margin="0,0,0,12" />
 
                 <TextBlock Text="{Binding Loc.Hotkeys}" Style="{StaticResource MutedText}" Margin="0,0,0,4" />
                 <TextBlock Text="{Binding Loc.ClearHotkeyHint}"

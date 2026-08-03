@@ -90,6 +90,8 @@ public sealed class LocalizationService : INotifyPropertyChanged
     public string Save => T("save");
     public string LanguageLabel => T("language");
     public string ClearHotkeyHint => T("clear_hotkey_hint");
+    public string HideIneligible => T("hide_ineligible");
+    public string HideIneligibleHint => T("hide_ineligible_hint");
     public string GhostToggleTip => T("ghost_toggle_tip");
 
     public string EvidenceDisplayName(EvidenceType type) => type switch
@@ -144,6 +146,8 @@ public sealed class LocalizationService : INotifyPropertyChanged
         ["save"] = "Salvar",
         ["language"] = "Idioma",
         ["clear_hotkey_hint"] = "Limpar: Shift + L (fixo)",
+        ["hide_ineligible"] = "Ocultar fantasmas fora",
+        ["hide_ineligible_hint"] = "Quando ativo, fantasmas vermelhos (fora) somem da lista.",
         ["ev_emf5"] = "EMF Nível 5",
         ["ev_spirit_box"] = "Spirit Box",
         ["ev_ultraviolet"] = "Ultravioleta",
@@ -204,6 +208,8 @@ public sealed class LocalizationService : INotifyPropertyChanged
         ["save"] = "Save",
         ["language"] = "Language",
         ["clear_hotkey_hint"] = "Clear: Shift + L (fixed)",
+        ["hide_ineligible"] = "Hide ruled-out ghosts",
+        ["hide_ineligible_hint"] = "When on, red (out) ghosts disappear from the list.",
         ["ev_emf5"] = "EMF Level 5",
         ["ev_spirit_box"] = "Spirit Box",
         ["ev_ultraviolet"] = "Ultraviolet",

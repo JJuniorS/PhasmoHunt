@@ -21,6 +21,7 @@ public partial class SettingsViewModel : ObservableObject
 
         Opacity = _draft.Opacity;
         UiScale = _draft.UiScale;
+        HideIneligibleGhosts = _draft.HideIneligibleGhosts;
         GhostSpeedPercentText = _draft.GhostSpeedPercent.ToString("0.##", CultureInfo.CurrentCulture);
         SyncLanguageFlags();
         RefreshHotkeyLabels();
@@ -33,6 +34,7 @@ public partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty] private double _opacity;
     [ObservableProperty] private double _uiScale;
+    [ObservableProperty] private bool _hideIneligibleGhosts;
     [ObservableProperty] private string _ghostSpeedPercentText = "100";
     [ObservableProperty] private string _stepHotkeyText = "";
     [ObservableProperty] private string _demonHotkeyText = "";
@@ -44,6 +46,7 @@ public partial class SettingsViewModel : ObservableObject
 
     partial void OnOpacityChanged(double value) => _draft.Opacity = value;
     partial void OnUiScaleChanged(double value) => _draft.UiScale = value;
+    partial void OnHideIneligibleGhostsChanged(bool value) => _draft.HideIneligibleGhosts = value;
 
     public void BeginCapture(string propertyName) => _capturingProperty = propertyName;
 
@@ -117,6 +120,7 @@ public partial class SettingsViewModel : ObservableObject
         _draft.GhostSpeedPercent = percent;
         _draft.Opacity = Opacity;
         _draft.UiScale = UiScale;
+        _draft.HideIneligibleGhosts = HideIneligibleGhosts;
         _draft.Language = LocalizationService.ToCode(LocalizationService.Instance.Language);
 
         if (HasHotkeyConflict(out var conflictMsg))

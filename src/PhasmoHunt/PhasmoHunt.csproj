@@ -16,6 +16,8 @@
 
   <ItemGroup>
     <Resource Include="Assets\app-icon.png" />
+    <Resource Include="Assets\en.png" />
+    <Resource Include="Assets\pt-Br.png" />
     <Resource Include="Assets\Evidence\*.png" />
     <Resource Include="Assets\Peculiarities\*.png" />
   </ItemGroup>

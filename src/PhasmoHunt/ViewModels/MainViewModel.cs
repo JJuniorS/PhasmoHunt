@@ -23,6 +23,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly SessionComparisonService _sessionComparison = new();
     private readonly SettingsService _settingsService;
     private readonly HotkeyService _hotkeyService;
+    private readonly List<GhostListItemViewModel> _allGhosts = new();
     private readonly List<TimeSpan> _stepTimestamps = new();
     private readonly List<SpeedMeasurement> _sessionReadings = new();
     private readonly Stopwatch _sessionWatch = new();
@@ -45,6 +46,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var settings = _settingsService.Load();
         Opacity = settings.Opacity;
         UiScale = settings.UiScale;
+        HideIneligibleGhosts = settings.HideIneligibleGhosts;
         LocalizationService.Instance.SetLanguage(settings.Language);
 
         _uiTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
@@ -73,12 +75,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         foreach (var ghost in _ghostCatalog.GetAll().OrderBy(g => g.Name, StringComparer.OrdinalIgnoreCase))
         {
-            Ghosts.Add(new GhostListItemViewModel(ghost, OnGhostEligibilityChanged));
+            var item = new GhostListItemViewModel(ghost, OnGhostEligibilityChanged);
+            _allGhosts.Add(item);
+            Ghosts.Add(item);
         }
 
         ApplySpeedFactorToGhostList();
 
-        CatalogCountText = LocalizationService.Instance.Format("catalog_count", Ghosts.Count);
+        CatalogCountText = LocalizationService.Instance.Format("catalog_count", _allGhosts.Count);
         foreach (var evidence in EvidenceTypeExtensions.All)
         {
             EvidenceOptions.Add(new EvidenceOptionViewModel(evidence, OnEvidenceSelectionChanged));
@@ -130,6 +134,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty] private System.Windows.Media.ImageSource? _incenseIcon;
     [ObservableProperty] private string _incenseTimerText = "--:--";
     [ObservableProperty] private bool _isIncenseRunning;
+    [ObservableProperty] private bool _hideIneligibleGhosts;
 
     public string CompactToggleGlyph => IsUiCompact ? "▢" : "─";
 
@@ -161,6 +166,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _settingsService.SaveDebounced(settings);
     }
 
+    partial void OnHideIneligibleGhostsChanged(bool value)
+    {
+        var settings = _settingsService.Current;
+        settings.HideIneligibleGhosts = value;
+        _settingsService.SaveDebounced(settings);
+        ResortGhosts();
+    }
+
     partial void OnSessionStateChanged(MeasurementSessionState value)
     {
         OnPropertyChanged(nameof(CanFinish));
@@ -189,7 +202,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             option.RefreshDisplayName();
         }
 
-        CatalogCountText = LocalizationService.Instance.Format("catalog_count", Ghosts.Count);
+        CatalogCountText = LocalizationService.Instance.Format("catalog_count", _allGhosts.Count);
         OnStepCountChanged(StepCount);
         RefreshHotkeyLabels();
 
@@ -253,6 +266,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var settings = _settingsService.Current;
         Opacity = settings.Opacity;
         UiScale = settings.UiScale;
+        HideIneligibleGhosts = settings.HideIneligibleGhosts;
         LocalizationService.Instance.SetLanguage(settings.Language);
         ApplySpeedFactorToGhostList();
         RematchSessionReadings();
@@ -270,7 +284,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private void ApplySpeedFactorToGhostList()
     {
         var factor = GhostSpeedFactor;
-        foreach (var item in Ghosts)
+        foreach (var item in _allGhosts)
         {
             item.ApplySpeedFactor(factor);
         }
@@ -338,7 +352,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             option.IsSelected = false;
         }
 
-        foreach (var ghost in Ghosts)
+        foreach (var ghost in _allGhosts)
         {
             ghost.ClearManualOverride();
         }
@@ -723,7 +737,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         if (!hasSpeedFilter && !hasEvidenceFilter && !hasPeculiarityFilter)
         {
-            foreach (var item in Ghosts)
+            foreach (var item in _allGhosts)
             {
                 item.SetEligibility(null);
             }
@@ -732,7 +746,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        foreach (var item in Ghosts)
+        foreach (var item in _allGhosts)
         {
             var speedOk = !hasSpeedFilter || speedEligibleIds!.Contains(item.Ghost.Id);
             var evidenceOk = !hasEvidenceFilter || item.Ghost.MatchesEvidence(selectedEvidence);
@@ -758,7 +772,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private void ResortGhosts()
     {
-        var ordered = Ghosts
+        var ordered = _allGhosts
+            .Where(g => !HideIneligibleGhosts || g.IsEligible != false)
             .OrderByDescending(g => g.IsEligible == true)
             .ThenBy(g => g.IsEligible is null)
             .ThenBy(g => g.Name, StringComparer.OrdinalIgnoreCase)

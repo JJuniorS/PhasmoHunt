@@ -206,12 +206,11 @@
                 <DockPanel>
                     <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6">
                         <TextBlock Text="{Binding Loc.Ghosts}" FontWeight="SemiBold" VerticalAlignment="Center" />
-                        <TextBlock DockPanel.Dock="Right"
-                                   Text="{Binding Loc.GhostsLegend}"
-                                   Style="{StaticResource MutedText}"
-                                   FontSize="11"
-                                   HorizontalAlignment="Right"
-                                   VerticalAlignment="Center" />
+                        <CheckBox DockPanel.Dock="Right"
+                                  IsChecked="{Binding HideIneligibleGhosts, Mode=TwoWay}"
+                                  ToolTip="{Binding Loc.HideIneligibleHint}"
+                                  VerticalAlignment="Center"
+                                  Margin="8,0,0,0" />
                     </DockPanel>
                     <ScrollViewer VerticalScrollBarVisibility="Disabled"
                                   HorizontalScrollBarVisibility="Disabled">
