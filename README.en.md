@@ -18,7 +18,11 @@ Helps you identify the ghost by measuring footstep speed, cross-checking evidenc
 - Useful minimum: **6 clicks** (2 per part). E.g. 6 → 2/2/2 · 24 → 8/8/8 · 7 → 2/2/2 (drops 1).
 - Speed in m/s aligned with the Zero-Network community BPM finder.
 - Match tolerance: **±0.10 m/s**.
-- Shows reading pattern (stable, speeding up, slowing down, irregular) and confidence.
+- Shows reading pattern (stable, speeding up, slowing down, irregular) and **reliability**.
+
+#### Reliability
+
+**Reliability** (0–100%) reflects how **regular** the intervals between the steps you logged were. A steady rhythm raises the percentage; uneven taps, delays, or mixed pace lower it. It helps you decide whether the average is safe to use for ghost filtering or whether to **re-run the reading** — it does not name the ghost; it only rates the quality of the measurement.
 
 ### Catalog and filters
 

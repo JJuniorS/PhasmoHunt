@@ -18,7 +18,11 @@ Ajuda a identificar o fantasma medindo a velocidade dos passos, cruzando com evi
 - Mínimo útil: **6 cliques** (2 por parte). Ex.: 6 → 2/2/2 · 24 → 8/8/8 · 7 → 2/2/2 (descarta 1).
 - Velocidade em m/s alinhada ao BPM finder da comunidade Zero-Network.
 - Tolerância de correspondência: **±0,10 m/s**.
-- Mostra padrão da leitura (estável, acelerando, desacelerando, irregular) e confiança.
+- Mostra padrão da leitura (estável, acelerando, desacelerando, irregular) e **confiabilidade**.
+
+#### Confiabilidade
+
+A **confiabilidade** (0–100%) mede o quão **regulares** foram os intervalos entre os passos que você marcou. Ritmo estável sobe a porcentagem; cliques irregulares, atrasos ou misturas de ritmo baixam. O intuito é te ajudar a decidir se a média pode ser usada com segurança no filtro de fantasmas ou se vale **repetir a leitura** — não afirma qual fantasma é, só a qualidade da medição.
 
 ### Catálogo e filtros
 

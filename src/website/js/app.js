@@ -21,6 +21,9 @@
       "features.speed.title": "Velocidade dos passos",
       "features.speed.body":
         "Registre passos com a tecla 1 ou o botão lateral. Após 3s sem cliques, a leitura fecha sozinha em 3 médias (±0,10 m/s).",
+      "features.reliability.title": "Confiabilidade",
+      "features.reliability.body":
+        "Porcentagem (0–100%) que mostra o quão regulares foram os intervalos entre os passos. Alta = ritmo estável e leitura mais segura para filtrar; baixa = vale repetir a medição. Não identifica o fantasma — avalia a qualidade do clique.",
       "features.evidence.title": "Evidências + catálogo",
       "features.evidence.body":
         "Filtre 30 fantasmas por evidência e velocidade. Tooltips nos ícones; The Mimic inclui Orb falsa.",
@@ -46,7 +49,7 @@
       "how.s2.body": "Sem novos toques, a leitura finaliza e divide em P1 / P2 / P3.",
       "how.s3.title": "Confira os candidatos",
       "how.s3.body":
-        "Veja média, padrão (estável/acelerando/…) e fantasmas compatíveis. Clique no nome para marcar apto ou fora.",
+        "Veja média, padrão (estável/acelerando/…), confiabilidade e fantasmas compatíveis. Clique no nome para marcar apto ou fora.",
       "how.s4.title": "Marque evidências",
       "how.s4.body":
         "Refine o filtro e use peculiaridades (Shift+1/2/3). Oculte os fora se quiser só os candidatos. Shift+L limpa a sessão.",
@@ -93,6 +96,9 @@
       "features.speed.title": "Footstep speed",
       "features.speed.body":
         "Log steps with key 1 or the mouse side button. After 3s idle, the reading closes into 3 averages (±0.10 m/s).",
+      "features.reliability.title": "Reliability",
+      "features.reliability.body":
+        "A 0–100% score of how regular the intervals between your step clicks were. High = steady rhythm and a safer reading for filtering; low = worth measuring again. It does not name the ghost — it rates the quality of the tap timing.",
       "features.evidence.title": "Evidence + catalog",
       "features.evidence.body":
         "Filter 30 ghosts by evidence and speed. Icon tooltips; The Mimic includes the fake Orb.",
@@ -118,7 +124,7 @@
       "how.s2.body": "With no new taps, the reading finishes and splits into P1 / P2 / P3.",
       "how.s3.title": "Check candidates",
       "how.s3.body":
-        "See average, pattern (stable/speeding up/…) and matching ghosts. Click a name to mark match or out.",
+        "See average, pattern (stable/speeding up/…), reliability, and matching ghosts. Click a name to mark match or out.",
       "how.s4.title": "Mark evidence",
       "how.s4.body":
         "Tighten the filter and use peculiarities (Shift+1/2/3). Hide ruled-out ghosts if you want candidates only. Shift+L clears the session.",
