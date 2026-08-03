@@ -42,6 +42,12 @@ public partial class SettingsWindow : Window
             e.Handled = true;
     }
 
+    private void PtBrFlag_OnClick(object sender, RoutedEventArgs e) =>
+        Vm?.SelectLanguageCommand.Execute("pt-BR");
+
+    private void EnFlag_OnClick(object sender, RoutedEventArgs e) =>
+        Vm?.SelectLanguageCommand.Execute("en");
+
     private void SaveButton_OnClick(object sender, RoutedEventArgs e)
     {
         if (Vm is null) return;
@@ -53,4 +59,7 @@ public partial class SettingsWindow : Window
             Close();
         }
     }
+
+    private void Window_OnClosed(object? sender, EventArgs e) =>
+        Vm?.Detach();
 }

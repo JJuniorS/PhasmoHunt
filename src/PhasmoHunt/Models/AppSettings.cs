@@ -18,6 +18,9 @@ public sealed class AppSettings
 
     public double GhostSpeedPercent { get; set; } = 100;
 
+    /// <summary>UI language code: "pt-BR" (default) or "en".</summary>
+    public string Language { get; set; } = "pt-BR";
+
     public HotkeyBinding StepHotkey { get; set; } = new(DefaultStepVk);
     public HotkeyBinding DemonCooldownHotkey { get; set; } = new(DefaultDemonVk, ModShift);
     public HotkeyBinding IncenseTimerHotkey { get; set; } = new(DefaultIncenseVk, ModShift);
@@ -40,6 +43,7 @@ public sealed class AppSettings
             UiScale = UiScale,
             Theme = Theme,
             GhostSpeedPercent = GhostSpeedPercent,
+            Language = Language,
             StepHotkey = StepHotkey.Clone(),
             DemonCooldownHotkey = DemonCooldownHotkey.Clone(),
             IncenseTimerHotkey = IncenseTimerHotkey.Clone(),

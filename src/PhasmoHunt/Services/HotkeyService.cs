@@ -10,7 +10,9 @@ public enum HotkeyAction
     Step = 1,
     DemonCooldown = 2,
     ObamboCycle = 3,
-    IncenseTimer = 4
+    IncenseTimer = 4,
+    /// <summary>Fixed Shift+L — not user-configurable.</summary>
+    Clear = 5
 }
 
 /// <summary>
@@ -25,7 +27,11 @@ public sealed class HotkeyService : IDisposable
     public const int VkDigit1 = 0x31;
     public const int VkDigit2 = 0x32;
     public const int VkDigit3 = 0x33;
+    /// <summary>VK_L — fixed Clear hotkey with Shift.</summary>
+    public const int VkL = 0x4C;
     public const int ModShift = 0x0004;
+
+    public static HotkeyBinding FixedClearHotkey { get; } = new(VkL, ModShift);
 
     private const int WmHotkey = 0x0312;
     private const int WhMouseLl = 14;
@@ -59,15 +65,21 @@ public sealed class HotkeyService : IDisposable
     {
         UnregisterAll();
         settings.EnsureHotkeyDefaults();
+        var loc = LocalizationService.Instance;
         var failed = new List<string>();
+
+        // Fixed Clear first so user bindings lose on collision.
+        if (!RegisterBinding(HotkeyAction.Clear, FixedClearHotkey.VirtualKey, FixedClearHotkey.Modifiers))
+            failed.Add(loc.Clear + " (Shift + L)");
+
         if (!RegisterBinding(HotkeyAction.Step, settings.StepHotkey.VirtualKey, settings.StepHotkey.Modifiers))
-            failed.Add("Passo");
+            failed.Add(loc.Step);
         if (!RegisterBinding(HotkeyAction.DemonCooldown, settings.DemonCooldownHotkey.VirtualKey, settings.DemonCooldownHotkey.Modifiers))
-            failed.Add("Demônio");
+            failed.Add(loc.Demon);
         if (!RegisterBinding(HotkeyAction.IncenseTimer, settings.IncenseTimerHotkey.VirtualKey, settings.IncenseTimerHotkey.Modifiers))
-            failed.Add("Incenso");
+            failed.Add(loc.Incense);
         if (!RegisterBinding(HotkeyAction.ObamboCycle, settings.ObamboCycleHotkey.VirtualKey, settings.ObamboCycleHotkey.Modifiers))
-            failed.Add("Obambo");
+            failed.Add(loc.Obambo);
         EnsureMouseHook();
         return failed;
     }

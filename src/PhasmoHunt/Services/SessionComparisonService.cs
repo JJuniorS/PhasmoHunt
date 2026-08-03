@@ -14,11 +14,12 @@ public sealed class SessionComparisonService
 {
     public SessionComparisonResult Compare(IReadOnlyList<SpeedMeasurement> readings)
     {
+        var loc = LocalizationService.Instance;
         if (readings.Count == 0)
         {
             return new SessionComparisonResult
             {
-                SummaryText = "Nenhuma leitura na sessão.",
+                SummaryText = loc.T("session_no_readings"),
                 SpeedsText = "—",
                 CommonGhostsText = "—",
                 CommonGhosts = []
@@ -30,7 +31,7 @@ public sealed class SessionComparisonService
             var only = readings[0];
             return new SessionComparisonResult
             {
-                SummaryText = $"1 leitura · {only.PatternText}",
+                SummaryText = loc.Format("session_one_reading", only.PatternText),
                 SpeedsText = FormatReadingSpeeds(only),
                 CommonGhostsText = FormatGhosts(only.CompatibleGhosts),
                 CommonGhosts = only.CompatibleGhosts
@@ -75,14 +76,17 @@ public sealed class SessionComparisonService
         }
 
         var spreadNote = segMax - segMin >= 0.8
-            ? "Partes da sessão cobrem faixa larga (possível fantasma variável)."
+            ? loc.T("session_spread_wide")
             : max - min <= 0.25
-                ? "Leituras consistentes entre si."
-                : "Leituras divergem — compare as 3 partes de cada uma.";
+                ? loc.T("session_consistent")
+                : loc.T("session_diverge");
 
         return new SessionComparisonResult
         {
-            SummaryText = $"{readings.Count} leituras · média {avg:F2} m/s ({min:F2}–{max:F2}) · {spreadNote}",
+            SummaryText = string.Format(
+                System.Globalization.CultureInfo.InvariantCulture,
+                loc.T("session_many"),
+                readings.Count, avg, min, max, spreadNote),
             SpeedsText = string.Join("  |  ", readings.Select((r, i) =>
                 $"#{readings.Count - i} {FormatReadingSpeeds(r)}")),
             CommonGhostsText = FormatGhosts(commonGhosts),
@@ -95,6 +99,6 @@ public sealed class SessionComparisonService
 
     private static string FormatGhosts(IReadOnlyList<GhostInfo> ghosts) =>
         ghosts.Count == 0
-            ? "Sem consenso ainda"
+            ? LocalizationService.Instance.T("session_no_consensus")
             : string.Join(", ", ghosts.Select(g => g.Name));
 }

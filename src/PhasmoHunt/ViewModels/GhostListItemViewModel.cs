@@ -1,5 +1,6 @@
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PhasmoHunt.Models;
 using PhasmoHunt.Services;
 
@@ -11,13 +12,18 @@ public partial class GhostListItemViewModel : ObservableObject
     private static readonly SolidColorBrush IneligibleBrush = CreateBrush(0xE3, 0x5D, 0x6A);
     private static readonly SolidColorBrush PendingBrush = CreateBrush(0x9A, 0xA3, 0xB2);
 
-    public GhostListItemViewModel(GhostInfo ghost)
+    private readonly Action? _onEligibilityChanged;
+    private bool? _autoEligible;
+    private bool? _manualOverride;
+
+    public GhostListItemViewModel(GhostInfo ghost, Action? onEligibilityChanged = null)
     {
         Ghost = ghost;
         Name = ghost.Name;
         SpeedRangeText = ghost.SpeedRangeText;
         Notes = ghost.SpeedNotes ?? "";
         EvidenceIcons = EvidenceIconService.GetIcons(ghost);
+        _onEligibilityChanged = onEligibilityChanged;
         SetEligibility(null);
     }
 
@@ -43,15 +49,41 @@ public partial class GhostListItemViewModel : ObservableObject
         SpeedRangeText = Ghost.FormatSpeedRange(speedFactor);
     }
 
+    /// <summary>
+    /// System-driven eligibility (filters). Manual overrides still win for display.
+    /// </summary>
     public void SetEligibility(bool? eligible)
     {
-        IsEligible = eligible;
-        if (eligible is null)
+        _autoEligible = eligible;
+        ApplyDisplay();
+    }
+
+    public void ClearManualOverride()
+    {
+        _manualOverride = null;
+        ApplyDisplay();
+    }
+
+    [RelayCommand]
+    private void ToggleEligibility()
+    {
+        // Alterna só entre apto (verde) e fora (vermelho).
+        var currentlyApto = (_manualOverride ?? _autoEligible) == true;
+        _manualOverride = !currentlyApto;
+        ApplyDisplay();
+        _onEligibilityChanged?.Invoke();
+    }
+
+    private void ApplyDisplay()
+    {
+        var effective = _manualOverride ?? _autoEligible;
+        IsEligible = effective;
+        if (effective is null)
         {
             StatusText = "—";
             StatusBrush = PendingBrush;
         }
-        else if (eligible.Value)
+        else if (effective.Value)
         {
             StatusText = "Apto";
             StatusBrush = EligibleBrush;
