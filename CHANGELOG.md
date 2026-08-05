@@ -6,7 +6,7 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e o projeto usa [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 Versões do app correspondem a **tags** `vX.Y.Z` e a [GitHub Releases](https://github.com/JJuniorS/PhasmoHunt/releases).
-O binário de download fica em provedor externo (configurado em `src/website/release.json`).
+O zip de download é anexado automaticamente na Release (URL em `src/website/release.json`).
 
 ## [Unreleased]
 

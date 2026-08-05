@@ -9,7 +9,7 @@ dist/
 docs/*
 .superpowers/
 
-# Local packaging — binário vai para Drive; versões via GitHub Releases
+# Local packaging output (CI publishes zip to GitHub Releases)
 publish/
 *.zip
 *.exe
