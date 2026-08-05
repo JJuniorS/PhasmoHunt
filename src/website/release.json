@@ -1,18 +1,27 @@
 {
-  "version": "1.1.2",
-  "tag": "v1.1.2",
+  "version": "1.1.3",
+  "tag": "v1.1.3",
   "publishedAt": "2026-08-05",
-  "fileName": "PhasmoHunt-v1.1.2-win-x64.zip",
-  "downloadUrl": "https://github.com/JJuniorS/PhasmoHunt/releases/download/v1.1.2/PhasmoHunt-v1.1.2-win-x64.zip",
+  "fileName": "PhasmoHunt-v1.1.3-win-x64.zip",
+  "downloadUrl": "https://github.com/JJuniorS/PhasmoHunt/releases/download/v1.1.3/PhasmoHunt-v1.1.3-win-x64.zip",
   "platform": "Windows x64",
   "requires": "Windows 10/11 x64",
   "githubReleasesUrl": "https://github.com/JJuniorS/PhasmoHunt/releases",
   "changelogUrl": "https://github.com/JJuniorS/PhasmoHunt/blob/main/CHANGELOG.md",
   "notes": {
-    "pt": "Release automatica v1.1.2",
-    "en": "Automatic release v1.1.2"
+    "pt": "Release automatica v1.1.3",
+    "en": "Automatic release v1.1.3"
   },
   "history": [
+    {
+      "version": "1.1.3",
+      "tag": "v1.1.3",
+      "publishedAt": "2026-08-05",
+      "notes": {
+        "pt": "Release automatica v1.1.3",
+        "en": "Automatic release v1.1.3"
+      }
+    },
     {
       "version": "1.1.2",
       "tag": "v1.1.2",
