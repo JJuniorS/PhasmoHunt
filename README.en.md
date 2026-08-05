@@ -119,11 +119,11 @@ Evidence, peculiarity, and app icons were **created for this project** (AI-gener
 ## Website and download
 
 | What | Where |
-|------|--------|
+|------|-------|
 | Static site | `src/website/` |
-| Deploy | GitHub Actions → **GitHub Pages** (`Deploy website` workflow) |
-| Binary link | `downloadUrl` field in [`src/website/release.json`](src/website/release.json) (Google Drive, etc.) |
-| Version history | [CHANGELOG.md](CHANGELOG.md) + [GitHub Releases](https://github.com/JJuniorS/PhasmoHunt/releases) (`v*` tags) |
+| Site deploy | GitHub Actions → **GitHub Pages** (`Deploy website` workflow) |
+| Binary | GitHub Release asset; URL in [`src/website/release.json`](src/website/release.json) |
+| Releases | Push to `main` → `App release` workflow (patch bump, build, `v*` tag, zip upload) |
 
 The site download button reads `release.json` at runtime. While `downloadUrl` is empty, the CTA shows as “coming soon”.
 

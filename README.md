@@ -121,9 +121,9 @@ src/website/    # Landing page (GitHub Pages)
 | O quê | Onde |
 |-------|------|
 | Site estático | `src/website/` |
-| Deploy | GitHub Actions → **GitHub Pages** (workflow `Deploy website`) |
-| Link do binário | campo `downloadUrl` em [`src/website/release.json`](src/website/release.json) (Google Drive, etc.) |
-| Histórico de versões | [CHANGELOG.md](CHANGELOG.md) + [GitHub Releases](https://github.com/JJuniorS/PhasmoHunt/releases) (tags `v*`) |
+| Deploy do site | GitHub Actions → **GitHub Pages** (workflow `Deploy website`) |
+| Binário | GitHub Release asset; URL em [`src/website/release.json`](src/website/release.json) |
+| Releases | Push na `main` → workflow `App release` (bump patch, build, tag `v*`, upload zip) |
 
 O botão de download do site lê `release.json` em runtime. Enquanto `downloadUrl` estiver vazio, o CTA fica como “em breve”.
 

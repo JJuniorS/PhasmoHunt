@@ -1,43 +1,80 @@
 name: App release
 
-# Cria uma GitHub Release (changelog / histórico) quando uma tag v* é enviada.
-# O binário fica em provedor externo; atualize src/website/release.json antes ou depois.
-
 on:
   push:
-    tags:
-      - "v*"
+    branches: [main]
 
 permissions:
   contents: write
 
+concurrency:
+  group: app-release
+  cancel-in-progress: false
+
 jobs:
   release:
-    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'chore(release):') }}
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Extract version
-        id: ver
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Test
+        run: dotnet test PhasmoHunt.sln -c Release --nologo
+
+      - name: Prepare release metadata
+        id: meta
+        shell: pwsh
+        run: |
+          .\.github\scripts\Prepare-ReleaseMetadata.ps1 `
+            -ReleaseJsonPath "src/website/release.json" `
+            -CsprojPath "src/PhasmoHunt/PhasmoHunt.csproj" `
+            -Repository "${{ github.repository }}"
+
+      - name: Guard — tag must not already exist
         shell: bash
         run: |
-          TAG="${GITHUB_REF_NAME}"
-          VERSION="${TAG#v}"
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          TAG="${{ steps.meta.outputs.tag }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists"
+            exit 1
+          fi
 
-      - name: Build release notes
+      - name: Publish win-x64
+        run: >
+          dotnet publish src/PhasmoHunt/PhasmoHunt.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -o publish/win-x64
+          --nologo
+
+      - name: Zip artifact
+        shell: pwsh
+        run: |
+          $fileName = "${{ steps.meta.outputs.file_name }}"
+          Compress-Archive -Path "publish/win-x64/*" -DestinationPath $fileName -Force
+          Get-Item $fileName | Format-List Name, Length
+
+      - name: Build release body
         id: notes
         shell: bash
         run: |
-          VERSION="${{ steps.ver.outputs.version }}"
-          TAG="${{ steps.ver.outputs.tag }}"
+          VERSION="${{ steps.meta.outputs.version }}"
+          TAG="${{ steps.meta.outputs.tag }}"
+          FILE="${{ steps.meta.outputs.file_name }}"
+          URL="${{ steps.meta.outputs.download_url }}"
           {
             echo "## Phasmo Hunt ${VERSION}"
             echo ""
             if [[ -f CHANGELOG.md ]]; then
-              # Extrai a seção da versão no CHANGELOG (entre ## [x.y.z] e a próxima ##)
               awk -v ver="$VERSION" '
                 $0 ~ "^## \\[" ver "\\]" {grab=1; next}
                 grab && $0 ~ /^## / {exit}
@@ -47,18 +84,40 @@ jobs:
             echo ""
             echo "---"
             echo ""
-            echo "**Download:** binário no provedor externo configurado em [\`src/website/release.json\`](https://github.com/${{ github.repository }}/blob/${TAG}/src/website/release.json) (site do projeto)."
-            echo ""
-            echo "Código-fonte e notas de versão: este release no GitHub."
+            echo "**Download:** [${FILE}](${URL})"
           } > release-body.md
 
+      - name: Commit and tag
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/website/release.json src/PhasmoHunt/PhasmoHunt.csproj
+          git commit -m "chore(release): ${{ steps.meta.outputs.tag }}"
+          git tag "${{ steps.meta.outputs.tag }}"
+          git push origin "${{ steps.meta.outputs.tag }}"
+
       - name: Create GitHub Release
+        id: gh_release
         uses: softprops/action-gh-release@v2
         with:
-          name: Phasmo Hunt ${{ steps.ver.outputs.version }}
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: Phasmo Hunt ${{ steps.meta.outputs.version }}
           body_path: release-body.md
           generate_release_notes: true
-          draft: false
-          prerelease: ${{ contains(steps.ver.outputs.tag, '-') }}
+          files: ${{ steps.meta.outputs.file_name }}
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push release commit to main
+        shell: bash
+        run: git push origin HEAD:main
+
+      - name: Cleanup remote tag on release failure
+        if: failure() && steps.gh_release.outcome == 'failure'
+        shell: bash
+        run: |
+          TAG="${{ steps.meta.outputs.tag }}"
+          echo "Release failed; deleting remote tag $TAG to allow retry"
+          git push origin ":refs/tags/$TAG" || true
