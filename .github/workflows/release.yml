@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: app-release
@@ -113,6 +114,13 @@ jobs:
       - name: Push release commit to main
         shell: bash
         run: git push origin HEAD:main
+
+      # GITHUB_TOKEN pushes do not trigger other workflows; kick Pages deploy explicitly.
+      - name: Trigger website deploy
+        shell: bash
+        run: gh workflow run "Deploy website" --ref main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cleanup remote tag on release failure
         if: failure() && steps.gh_release.outcome == 'failure'
