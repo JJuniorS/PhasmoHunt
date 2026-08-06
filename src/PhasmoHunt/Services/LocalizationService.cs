@@ -93,6 +93,7 @@ public sealed class LocalizationService : INotifyPropertyChanged
     public string HideIneligible => T("hide_ineligible");
     public string HideIneligibleHint => T("hide_ineligible_hint");
     public string GhostToggleTip => T("ghost_toggle_tip");
+    public string FanDisclaimer => T("fan_disclaimer");
 
     public string EvidenceDisplayName(EvidenceType type) => type switch
     {
@@ -181,6 +182,7 @@ public sealed class LocalizationService : INotifyPropertyChanged
         ["session_diverge"] = "Leituras divergem — compare as 3 partes de cada uma.",
         ["session_no_consensus"] = "Sem consenso ainda",
         ["ghost_toggle_tip"] = "Clique para marcar apto / fora",
+        ["fan_disclaimer"] = "Phasmophobia © Kinetic Games Limited. Ferramenta criada pela comunidade"
     };
 
     private static readonly Dictionary<string, string> En = new(StringComparer.Ordinal)
@@ -243,5 +245,6 @@ public sealed class LocalizationService : INotifyPropertyChanged
         ["session_diverge"] = "Readings diverge — compare each reading's 3 parts.",
         ["session_no_consensus"] = "No consensus yet",
         ["ghost_toggle_tip"] = "Click to mark match / out",
+        ["fan_disclaimer"] = "Phasmophobia © Kinetic Games Limited. Tool created by community",
     };
 }

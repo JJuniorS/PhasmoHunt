@@ -34,6 +34,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition x:Name="GhostsRow" Height="*" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <!-- Title -->
@@ -401,6 +402,14 @@
                     </DockPanel>
                 </Border>
             </Grid>
+
+            <TextBlock Grid.Row="6"
+                       Text="{Binding Loc.FanDisclaimer}"
+                       Style="{StaticResource MutedText}"
+                       FontSize="10"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center"
+                       Margin="0,8,0,0" />
         </Grid>
     </Border>
 </Window>

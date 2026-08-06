@@ -428,6 +428,13 @@ a.btn.is-disabled {
   font-weight: 500;
 }
 
+.disclaimer-fan {
+  margin: 1rem 0 0;
+  color: var(--muted-2);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
 .site-footer {
   width: min(1120px, calc(100% - 2rem));
   margin: 0 auto;

@@ -73,9 +73,11 @@
       "disclaimer.i5": "Não automatiza ações no jogo",
       "disclaimer.note":
         "É um overlay de apoio manual — não é cheat client. Toda informação é inserida por você.",
+      "disclaimer.fan":
+        "Phasmophobia © Kinetic Games Limited. Ferramenta não oficial da comunidade — não afiliada, endossada ou patrocinada pela Kinetic Games.",
       "footer.github": "GitHub — JJuniorS/PhasmoHunt",
       "footer.copy":
-        "Ferramenta da comunidade para Phasmophobia. Não afiliada à Kinetic Games nem ao Phasmophobia.",
+        "Phasmophobia © Kinetic Games Limited. Ferramenta não oficial da comunidade (fan-made) — não afiliada, endossada ou patrocinada pela Kinetic Games.",
     },
     en: {
       "nav.features": "Features",
@@ -148,9 +150,11 @@
       "disclaimer.i5": "Does not automate in-game actions",
       "disclaimer.note":
         "It is a manual helper overlay — not a cheat client. Every input comes from you.",
+      "disclaimer.fan":
+        "Phasmophobia © Kinetic Games Limited. Unofficial community tool — not affiliated with, endorsed by, or sponsored by Kinetic Games.",
       "footer.github": "GitHub — JJuniorS/PhasmoHunt",
       "footer.copy":
-        "A community tool for Phasmophobia. Not affiliated with Kinetic Games or Phasmophobia.",
+        "Phasmophobia © Kinetic Games Limited. Unofficial fan-made community tool — not affiliated with, endorsed by, or sponsored by Kinetic Games.",
     },
   };
 

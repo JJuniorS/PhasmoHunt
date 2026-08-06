@@ -133,4 +133,4 @@ The site download button reads `release.json` at runtime. While `downloadUrl` is
 
 Code under the [MIT license](LICENSE).
 
-Phasmophobia and Kinetic Games are trademarks of their respective owners. Phasmo Hunt is an unofficial community tool and is **not affiliated with, endorsed by, or sponsored by** Kinetic Games.
+**Phasmophobia © Kinetic Games Limited.** Phasmo Hunt is an unofficial fan-made community tool and is **not affiliated with, endorsed by, or sponsored by** Kinetic Games.
